@@ -77,8 +77,9 @@
 
                 <div class="col-xs-6 col-sm-2 form-inline">
                     <div class="form-group area-search-control-view">
-                        <button class="btn btn-primary" onclick="searchShop('<?php echo base_url(); ?>');">查询</button>
-
+                        <a class="btn btn-primary" href="#" onclick="searchShop('<?php echo base_url(); ?>');">
+                            <span>查询</span>
+                        </a>
                         <a class="btn btn-primary" href="<?php echo base_url(); ?>addshop">
                             <span>新增</span>
                         </a>
@@ -93,13 +94,13 @@
                     <thead>
                     <tr style="background-color: lightslategrey;">
                         <th>商家名称</th>
-                        <th width="100">商家类型</th>
-                        <th width="100">景区数</th>
-                        <th width="100">旅游线路数</th>
-                        <th width="100">授权码数</th>
+                        <th width="">商家类型</th>
+                        <th width="">景区数</th>
+                        <th width="">旅游线路数</th>
+                        <th width="">授权码数</th>
                         <th>所属地区</th>
-                        <th width="100">状态</th>
-                        <th width="350">操作</th>
+                        <th width="">状态</th>
+                        <th width="">操作</th>
                     </tr>
                     </thead>
                     <tbody id="content_tbl">

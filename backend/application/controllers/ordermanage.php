@@ -92,6 +92,8 @@ class ordermanage extends BaseController
         for ($i = 0; $i < $Count; $i++) {
             $item = $buyList[$i];
             $shop = $this->shop_model->getShopById($item->shop_name);
+            if (count($shop) > 0)
+                if ($shop->status != 0) continue;
             if ($this->global['shop_manager_number'] != '') {
                 if (count($shop) == 0) continue;
                 if ($shop->phonenumber != $this->global['shop_manager_number']) continue;
@@ -120,7 +122,9 @@ class ordermanage extends BaseController
             $output_html .= (($item->tour_point == 0) ? '所有' : $pointitem->name);
             $output_html .= '</td>';
             $shopitem = $this->shop_model->getShopById($item->shop_name);
-            $output_html .= '<td>' . (isset($shopitem->name) ? $shopitem->name : '') . '</td>';
+            if ($this->global['shop_manager_number'] == '') {
+                $output_html .= '<td>' . (isset($shopitem->name) ? $shopitem->name : '') . '</td>';
+            }
             $output_html .= '<td>';
             $output_html .= ($item->status == '1' ? '使用中' : ($item->status == '2' ? '未付款' :
                 ($item->status == '3' ? '已取消' : ($item->status == '4' ? '已过期' : ''))));
@@ -195,6 +199,8 @@ class ordermanage extends BaseController
         for ($i = 0; $i < $authCount; $i++) {
             $item = $authList[$i];
             $shop = $this->shop_model->getShopById($item->shop_name);
+            if (count($shop) > 0)
+                if ($shop->status != 0) continue;
             if ($this->global['shop_manager_number'] != '') {
                 if (count($shop) == 0) continue;
                 if ($shop->phonenumber != $this->global['shop_manager_number']) continue;
@@ -219,7 +225,9 @@ class ordermanage extends BaseController
             $output_html .= '<td>' . (($item->type == 1) ? $cs_name : $item->tour_area) . '</td>';
 
             $sh = $this->shop_model->getShopById($item->shop_name);
-            $output_html .= '<td>' . ((isset($sh->name)) ? $sh->name : '') . '</td>';
+            if ($this->global['shop_manager_number'] == '') {
+                $output_html .= '<td>' . ((isset($sh->name)) ? $sh->name : '') . '</td>';
+            }
             $output_html .= '<td>' . $item->ordered_time . '</td>';
             $output_html .= '</tr>';
         }

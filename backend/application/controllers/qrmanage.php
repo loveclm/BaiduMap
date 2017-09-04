@@ -40,6 +40,7 @@ class qrmanage extends BaseController
         } else {
             $this->global['pageTitle'] = '景区管理';
             $this->global['areaList'] = $this->area_model->getAreas($name, $address, $status);
+            $this->global['searchType'] = 0;
             $this->global['searchName'] = $name;
             $this->global['searchAddress'] = $address;
             $this->global['searchStatus'] = $status;
@@ -94,7 +95,7 @@ class qrmanage extends BaseController
         }
 
         $this->global['qrList'] = $qrList;
-
+        $this->global['searchType'] = 0;
         $this->global['searchName'] = '';
         $this->global['searchStatus'] = 0;
         $this->loadViews("qrmanage", $this->global, NULL, NULL);
@@ -144,16 +145,18 @@ class qrmanage extends BaseController
         );
         if (!empty($_POST)) {
 
+            $searchType = $_POST['searchType'];
             $name = $_POST['name'];
             $status = $_POST['status'];
 
             $qrList = array();
-            $qrDBList = $this->shop_model->getQR($name, $status);
+            $qrDBList = $this->shop_model->getQR($name, $status, $searchType);
             foreach ($qrDBList as $list) {
                 $areaid = $list->targetid;
                 $areaInfo = $this->area_model->getAreaById($areaid);
                 if (isset($areaInfo)) {
                     $courseName = $this->area_model->getCourseNameByAreaId($areaid);
+                    if ($searchType == 1 && $name!='all' && strstr($courseName, $name)==false) continue; // 0-shopname search, 1-coursename search
                     $areaInfo->name = $courseName;
                     if ($this->global['shop_manager_number'] != ''
                         && $this->global['shop_manager_number'] != $list->shopnumber
@@ -183,7 +186,9 @@ class qrmanage extends BaseController
         for ($i = 0; $i < $qrCount; $i++) {
             $qr = $qrList[$i];
             $output_html .= '<tr>';
-            $output_html .= '<td>' . $qr['shop'] . '</td>';
+            if ($this->global['shop_manager_number'] == '') {
+                $output_html .= '<td>' . $qr['shop'] . '</td>';
+            }
             $output_html .= '<td>' . $qr['type'] . '</td>';
             $output_html .= '<td>' . $qr['target'] . '</td>';
             $output_html .= '<td>' . $qr['time'] . '</td>';

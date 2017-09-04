@@ -116,15 +116,15 @@ class settle_model extends CI_Model
         $this->db->select("sum(code) as price");
         $this->db->from('tbl_order');
         $this->db->where("authid", $shopid);
+        $this->db->where("ordertype <> 4");
         $this->db->where("date(paid_time) >= date('" . $date_s . "')");
         $this->db->where("date(paid_time) < date('" . $date_e . "')");
-        $this->db->where("ordertype <> '4'");
         $query = $this->db->get();
         $qresult = $query->result();
-        if (count($qresult) > 0)
+        if (count($qresult) > 0) {
             return $qresult[0];
-        else
-            return '';
+        }else
+            return '0';
     }
 
     /**

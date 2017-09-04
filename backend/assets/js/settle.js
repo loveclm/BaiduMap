@@ -25,7 +25,7 @@ function searchBuyOrder(url) {
         type: 'post',
         url: url + 'settlemanage/buy_listing',
         dataType: 'json',
-        data: {searchType: searchType, name:name, stDate:stDate, enDate:enDate},
+        data: {searchType: searchType, name: name, stDate: stDate, enDate: enDate},
         success: function (res) {
             if (res.status == 'success') {
 
@@ -57,7 +57,7 @@ function searchAuthOrder(url) {
         type: 'post',
         url: url + 'settlemanage/auth_listing',
         dataType: 'json',
-        data: {searchType: searchType, name:name, stDate:stDate, enDate:enDate},
+        data: {searchType: searchType, name: name, stDate: stDate, enDate: enDate},
         success: function (res) {
             if (res.status == 'success') {
 
@@ -72,7 +72,7 @@ function searchAuthOrder(url) {
 }
 
 // Search course on Course List Page
-function settleBuyDetail(url) {
+function settleBuyDetail(url, id) {
     var searchType = $("#searchType :selected").val();
     var name = $('#searchName').val();
     var stDate = $('#startDate').val();
@@ -82,11 +82,11 @@ function settleBuyDetail(url) {
     enDate = enDate == '' ? '0' : enDate;
 
     location.href = url + 'settleBuyDetail/' + searchType + '/' +
-        name + '/' + stDate + '/' + enDate;
+        name + '/' + stDate + '/' + enDate + '/' + id;
 }
 
 // Search course on Course List Page
-function settleAuthDetail(url) {
+function settleAuthDetail(url, id) {
     var searchType = $("#searchTypeAuth :selected").val();
     var name = $('#searchNameAuth').val();
     var stDate = $('#startDateAuth').val();
@@ -98,7 +98,7 @@ function settleAuthDetail(url) {
     console.log(stDate + ',' + enDate);
 
     location.href = url + 'settleAuthDetail/' + searchType + '/' +
-        name + '/' + stDate + '/' + enDate;
+        name + '/' + stDate + '/' + enDate + '/' + id;
 }
 
 // Search course on Course List Page

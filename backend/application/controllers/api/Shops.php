@@ -16,6 +16,7 @@ class Shops extends REST_Controller
 
         $this->load->model('shop_model');
         $this->load->model('auth_model');
+        $this->load->model('user_model');
     }
 
     public function index_get()
@@ -49,12 +50,51 @@ class Shops extends REST_Controller
         }
     }
 
+    public function saveAccount_post($id = NULL)
+    {
+        $newShop = $this->post();
+        $date_now=new DateTime();
+        $newAccount = [
+            "email"=>$newShop['phonenumber'],
+            "name"=>$newShop['name'],
+            "password"=>getHashedPassword($newShop['password']),
+            "roleId"=>2, // shop manager
+            "isDeleted"=>0, //0-available, 1-deleted
+            "createdBy"=>1, // 1- created by admin
+            "createdDtm"=>date_format($date_now,"Y-m-d H:i:s"), // 1- created by admin
+        ];
+        if (!$id) {
+            $new_id = $this->user_model->addNewUser($newAccount);
+            if($new_id == 0) {
+                $this->response(array('status' => false, 'id' => 0, 'message' => sprintf('This account is exists.', $new_id)), 200);
+            }else {
+                $new_id = $this->shop_model->add($newShop);
+                $this->response(array('status' => true, 'id' => $new_id, 'message' => sprintf('Shop #%d has been created.', $new_id)), 200);
+            }
+        } else {
+            $new_id = $this->user_model->updateUser($newAccount, $newAccount['email']);
+            $this->shop_model->update($this->post(), $id);
+            $this->response(array('status' => true, 'message' => sprintf('Shop #%d has been updated.', $id)), 200);
+        }
+    }
+
     public function remove_post($id = NULL)
     {
-        if ($this->shop_model->delete($id)) {
+        $newShop = $this->shop_model->getShopById($id);
+        $date_now = new DateTime();
+        $newAccount = [
+            "email"=>$newShop->phonenumber,
+            "name"=>$newShop->name,
+            "password"=>getHashedPassword($newShop->password),
+            "roleId"=>2, // shop manager
+            "isDeleted"=>1, //0-available, 1-deleted
+            "createdBy"=>1, // 1- created by admin
+            "updatedDtm"=>date_format($date_now,"Y-m-d H:i:s"), // 1- updated by admin
+        ];
+        if ($this->shop_model->delete($id) && $this->user_model->updateUser($newAccount, $newAccount['email'])) {
             $this->response(array('status' => true, 'message' => sprintf('Area #%d has been deleted.', $id)), 200);
         } else {
-            $this->response(array('status' => false, 'error_message' => 'This Area does not exist!'), 404);
+            $this->response(array('status' => false, 'error_message' => 'This Area does not exist!'), 200);
         }
     }
 

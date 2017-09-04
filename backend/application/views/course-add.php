@@ -28,8 +28,11 @@
                 <div class="col-sm-10 custom-course-itemlist-view">
                     <div class="col-sm-5" style="height: 100%; padding: 10px;">
                         <div class="area-list-view">
-                            <input id="course-search" placeholder="搜索景点"/>
-                            <input type="button" value="find" onclick="findAreaInList('<?php echo base_url(); ?>');"/>
+                            <input class="btn btn-default" id="course-search" placeholder="搜索景区"/>
+                            <a href="#" class="btn btn-default" onclick="findAreaInList('<?php echo base_url(); ?>');">
+                                <i class="fa fa-search"></i>
+                            </a>
+<!--                            <input class"fa fa-search" type="button" value="" onclick=""/>-->
                             <div class="form-group">
                                 <ul id="courseList">
                                     <?php

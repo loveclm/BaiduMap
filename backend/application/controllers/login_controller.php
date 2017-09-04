@@ -40,7 +40,7 @@ class login_controller extends CI_Controller
         }
         else
         {
-            redirect('/area');
+            redirect('/shop');
         }
     }
     
@@ -81,7 +81,7 @@ class login_controller extends CI_Controller
                                     );
                                     
                     $this->session->set_userdata($sessionArray);
-                    
+
                     redirect('/shop');
                 }
             }
@@ -188,7 +188,7 @@ class login_controller extends CI_Controller
         }
         else
         {
-            redirect('/login');
+            redirect('/loginMe');
         }
     }
     
@@ -232,7 +232,7 @@ class login_controller extends CI_Controller
             
             setFlashData($status, $message);
 
-            redirect("/login");
+            redirect("/loginMe");
         }
     }
 

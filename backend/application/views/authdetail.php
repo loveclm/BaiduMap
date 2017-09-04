@@ -35,11 +35,11 @@
                 <table class="table table-bordered area-result-view">
                     <thead>
                     <tr style="background-color: lightslategrey;">
-                        <th sidth="100">序号</th>
+                        <th sidth="">序号</th>
                         <th>授权码</th>
                         <th>状态</th>
                         <th>订单时间</th>
-                        <th width="200">操作</th>
+                        <th width="">操作</th>
                     </tr>
                     </thead>
                     <tbody>

@@ -18,29 +18,16 @@
 
             <div class="row custom-info-row">
                 <label class="col-sm-2">*商家账号:</label>
-                <select class="col-sm-2" id="shopid" style="height: 25px;">
-                    <?php
-                    if (count($userList) != 0) {
-                        foreach ($userList as $item) {
-                            $number = $item->number;
-                            ?>
-                            <option value="<?php echo $number; ?>"
-                                <?php echo isset($shop) && $number == $shop->phonenumber ? 'selected' : ''; ?>>
-                                <?php echo $number; ?>
-                            </option>
-                            <?php
-                        }
-                    }
-                    ?>
-                </select>
+                <input type="text" class="col-sm-2" id="shopid"
+                       value="<?php echo isset($shop)? $shop->phonenumber:''; ?>"/>
 
                 <div id="custom-error-shopid" class="custom-error col-sm-4" style="display: none;">账号使用手机号，只能是11位</div>
             </div>
 
             <div class="row custom-info-row">
                 <label class="col-sm-2">*初始密码:</label>
-                <input type="text" class="col-sm-2" id="shoppassword"
-                       value="<?php echo isset($shop) ? $shop->password : ''; ?>"/>
+                <input type="text" class="col-sm-2" id="shoppassword" disabled
+                       value="<?php echo rand(100000,999999); ?>"/>
             </div>
 
             <div id="tip" class="row custom-info-row">

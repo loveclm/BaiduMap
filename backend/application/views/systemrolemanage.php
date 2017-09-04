@@ -21,10 +21,10 @@
                     <table class="table area-result-view table-bordered table-hover">
                         <thead>
                         <tr style="background-color: lightslategrey;">
-                            <th width="100">序号</th>
+                            <th width="">序号</th>
                             <th>用户角色</th>
-                            <th width="150">功能设置</th>
-                            <th width="250">操作</th>
+                            <th width="">功能设置</th>
+                            <th width="">操作</th>
                         </tr>
                         </thead>
                         <tbody>

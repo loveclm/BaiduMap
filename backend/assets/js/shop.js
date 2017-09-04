@@ -49,6 +49,7 @@ function searchShop(url) {
 // Search course on Course List Page
 function searchQR(url) {
 
+    var searchType = $('#searchType').val();
     var name = $('#searchName').val();
     var status = $('#searchStatus :selected').val();
     name = name == '' ? 'all' : name;
@@ -59,7 +60,7 @@ function searchQR(url) {
         type: 'post',
         url: url + 'qrmanage/qr_listing',
         dataType: 'json',
-        data: {name: name, status: status},
+        data: {name: name, status: status, searchType: searchType},
         success: function (res) {
             if (res.status == 'success') {
 
@@ -129,7 +130,7 @@ function processShop(url, id) {
             discount_rate: rate,
             status: 0
         };
-        reqUrl = url + "api/Shops/save/" + id;
+        reqUrl = url + "api/Shops/saveAccount/" + id;
     }
     else {
         shopInfo = {
@@ -142,11 +143,12 @@ function processShop(url, id) {
             discount_rate: rate,
             status: 0
         };
-        reqUrl = url + "api/Shops/save";
+        reqUrl = url + "api/Shops/saveAccount";
     }
 
     $.post(reqUrl, shopInfo, function (result) {
         console.log(result);
+        window.alert(result['message']);
         location.href = url + 'shop';
     });
 
@@ -166,6 +168,7 @@ function deleteShop(url, type) {
     $('#custom-confirm-delete-view').hide();
     if (type == 1) {  // if ok button clicked
         $.post(url + "api/Shops/remove/" + $('#current-areaid').val(), function (result) {
+            console.log(result);
             location.href = url + 'shop';
         });
     }

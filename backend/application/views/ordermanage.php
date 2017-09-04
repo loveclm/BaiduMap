@@ -87,14 +87,19 @@
                             <table class="table table-bordered area-result-view">
                                 <thead>
                                 <tr style="background-color: lightslategrey;">
-                                    <th width="150">订单编号</th>
-                                    <th width="150">手机号</th>
-                                    <th width="150">订单金额(元)</th>
+                                    <th width="">订单编号</th>
+                                    <th width="">手机号</th>
+                                    <th width="">订单金额(元)</th>
                                     <th width="">景区</th>
                                     <th width="">景点</th>
-                                    <th width="">所属商家</th>
-                                    <th width="100">状态</th>
-                                    <th width="150">订单时间</th>
+                                    <?php
+                                    if ($shop_manager_number == '') {
+                                        ?>
+                                        <th width="">所属商家</th>
+                                        <?php
+                                    } ?>
+                                    <th width="">状态</th>
+                                    <th width="">订单时间</th>
                                 </tr>
                                 </thead>
                                 <tbody id="content_tbl_1">
@@ -104,10 +109,13 @@
                                 for ($i = 0; $i < $Count; $i++) {
                                     $item = $buyList[$i];
                                     $shop = $this->shop_model->getShopById($item->shop_name);
+                                    if (count($shop) > 0)
+                                        if ($shop->status != 0) continue;
                                     if ($shop_manager_number != '') {
                                         if (count($shop) == 0) continue;
                                         if ($shop->phonenumber != $shop_manager_number) continue;
                                     }
+
                                     ?>
                                     <tr>
                                         <td><?php echo $item->number; ?></td>
@@ -137,11 +145,16 @@
                                             }
                                             ?>
                                         </td>
-                                        <td><?php
-                                            $shopitem = $this->shop_model->getShopById($item->shop_name);
-                                            echo isset($shopitem->name) ? $shopitem->name : '';
+                                        <?php
+                                        if ($shop_manager_number == '') {
                                             ?>
-                                        </td>
+                                            <td><?php
+                                                $shopitem = $this->shop_model->getShopById($item->shop_name);
+                                                echo isset($shopitem->name) ? $shopitem->name : '';
+                                                ?>
+                                            </td>
+                                            <?php
+                                        } ?>
                                         <td><?php
                                             echo $item->status == '1' ? '使用中' : ($item->status == '2' ? '未付款' :
                                                 ($item->status == '3' ? '已取消' : ($item->status == '4' ? '已过期' : ''))); ?>
@@ -220,13 +233,18 @@
                             <table class="table table-bordered area-result-view">
                                 <thead>
                                 <tr style="background-color: lightslategrey;">
-                                    <th width="150">订单编号</th>
-                                    <th width="150">手机号</th>
-                                    <th width="150">授权码</th>
-                                    <th width="100">付款方式</th>
+                                    <th width="">订单编号</th>
+                                    <th width="">手机号</th>
+                                    <th width="">授权码</th>
+                                    <th width="">付款方式</th>
                                     <th width="">景区</th>
-                                    <th width="">所属商家</th>
-                                    <th width="150">订单时间</th>
+                                    <?php
+                                    if ($shop_manager_number == '') {
+                                        ?>
+                                        <th width="">所属商家</th>
+                                        <?php
+                                    } ?>
+                                    <th width="">订单时间</th>
                                 </tr>
                                 </thead>
                                 <tbody id="content_tbl_2">
@@ -239,6 +257,8 @@
                                         if (count($shop) == 0) continue;
                                         if ($shop->phonenumber != $shop_manager_number) continue;
                                     }
+                                    if (count($shop) > 0)
+                                        if ($shop->status != 0) continue;
                                     ?>
                                     <tr>
                                         <td><?php echo $item->number; ?></td>
@@ -259,10 +279,15 @@
                                             echo ($item->type == 1) ? $cs_name : $item->tour_area;
                                             ?>
                                         </td>
-                                        <td><?php
-                                            $sh = $this->shop_model->getShopById($item->shop_name);
-                                            echo (isset($sh->name)) ? $sh->name : ''; ?>
-                                        </td>
+                                        <?php
+                                        if ($shop_manager_number == '') {
+                                            ?>
+                                            <td><?php
+                                                $sh = $this->shop_model->getShopById($item->shop_name);
+                                                echo (isset($sh->name)) ? $sh->name : ''; ?>
+                                            </td>
+                                            <?php
+                                        } ?>
                                         <td><?php echo $item->ordered_time; ?></td>
                                     </tr>
                                     <?php

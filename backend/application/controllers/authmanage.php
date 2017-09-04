@@ -49,7 +49,9 @@ class authmanage extends BaseController
                     if ($this->global ['shop_manager_number'] != ''
                         && $this->global ['shop_manager_number'] != $list->shopnumber
                     ) continue;
+
                     $list->tourName = $this->area_model->getCourseNameByAreaId($areaid);
+                    if ($searchType == 1 && strstr($name, $list->tourName) == false) continue; // 0-shopname search, 1-coursename search
                     $authList[$i] = $list;
                     $i++;
                 }
@@ -74,7 +76,6 @@ class authmanage extends BaseController
             $searchType = $_POST['searchType'];
             $name = $_POST['name'];
             $status = $_POST['status'];
-
             $auths = $this->auth_model->getAuths($searchType, $name, $status);
             $authList = NULL;
             if (count($auths) > 0) {
@@ -86,6 +87,8 @@ class authmanage extends BaseController
                         && $this->global ['shop_manager_number'] != $list->shopnumber
                     ) continue;
                     $list->tourName = $this->area_model->getCourseNameByAreaId($areaid);
+                    //var_dump($name.',,,,,'.$list->tourName.',,,,,,'.strstr($list->tourName, $name));
+                    if ($searchType == 1 && $name != 'ALL' && strstr($list->tourName, $name) == false) continue; // 0-shopname search, 1-coursename search
                     $authList[$i] = $list;
                     $i++;
                 }
@@ -104,7 +107,9 @@ class authmanage extends BaseController
             $item = $authList[$i];
 
             $output_html .= '<tr>';
-            $output_html .= '<td>' . $item->shopName . '</td>';
+            if ($this->global['shop_manager_number'] == '') {
+                $output_html .= '<td>' . $item->shopName . '</td>';
+            }
             $output_html .= '<td>' . $item->tourName . '</td>';
             $output_html .= '<td>' . $this->auth_model->getOrderTotal($item->id) . '</td>';
             $output_html .= '<td>' . $this->auth_model->getOrderUsed($item->id) . '</td>';
@@ -113,7 +118,7 @@ class authmanage extends BaseController
             $output_html .= '<td>' . ($item->money > 0 ? $item->money : '') . '</td>';
             $output_html .= '<td>';
             $output_html .= '<a href="' . base_url() . 'authDetail/' . $item->id . '/0">查看 &nbsp;</a>';
-            if ($item->money == 0) {
+            if ($item->money == 0 && $this->global['shop_manager_number'] == '') {
                 $output_html .= '<a href="#" onclick="showSelect(' . $item->id . ')">付款方式 &nbsp;</a>';
             }
             $output_html .= '</td>';

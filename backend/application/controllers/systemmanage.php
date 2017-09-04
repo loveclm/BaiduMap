@@ -163,7 +163,7 @@ class systemmanage extends BaseController
                 if ($result > 0) {
                     $this->session->set_flashdata('success', '新用户创建成功.');
                 } else {
-                    $this->session->set_flashdata('error', '用户创建失败.');
+                    $this->session->set_flashdata('error', '用户创建失败. 此帐户已存在了.');
                 }
                 redirect('addNew');
             }

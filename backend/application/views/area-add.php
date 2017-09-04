@@ -227,8 +227,8 @@
 
     @-moz-keyframes amap-indrm-loader {
         0% {
-            -moz-transform: rotate(0);
-            transform: rotate(0)
+            -moz-transform: rotate(0deg);
+            transform: rotate(0deg);
         }
         100% {
             -moz-transform: rotate(360deg);
@@ -238,8 +238,8 @@
 
     @-webkit-keyframes amap-indrm-loader {
         0% {
-            -webkit-transform: rotate(0);
-            transform: rotate(0)
+            -webkit-transform: rotate(0deg);
+            transform: rotate(0deg);
         }
         100% {
             -webkit-transform: rotate(360deg);
@@ -249,10 +249,10 @@
 
     @keyframes amap-indrm-loader {
         0% {
-            -moz-transform: rotate(0);
-            -ms-transform: rotate(0);
-            -webkit-transform: rotate(0);
-            transform: rotate(0)
+            -moz-transform: rotate(0deg);
+            -ms-transform: rotate(0deg);
+            -webkit-transform: rotate(0deg);
+            transform: rotate(0deg)
         }
         100% {
             -moz-transform: rotate(360deg);
@@ -332,16 +332,20 @@
                 </div>
                 <div class="col-sm-8">
                     <div class="form-group col-md-12" style="position: absolute; z-index: 1000;">
-                        <input id="city_Name" type="text" placeholder="输入您要定位的地址"
-                               value="<?php echo isset($area) ? ($area->address) : ''; ?>"/>
+                        <input class="btn btn-default" id="city_Name" type="text" placeholder="输入您要定位的地址"
+                               value="<?php echo isset($addrs[3])!='' ? ($addrs[3]) : ''; ?>"/>
+
                         <input id="area-position" style="display: none;"
                                value="<?php echo isset($area) ? json_encode($areaInfo->position) : ''; ?>"/>
+                        <a href="#" class="btn btn-default" onclick="$('#detail_editing_panel').show();">
+                            <i class="fa fa-search"></i>
+                        </a>
                     </div>
                     <!-- ////////////////////GaoDe Map Part  -->
                     <div id="custom-map-container" style="height: 600px;"></div>
                     <!-- ////////////////////                -->
                 </div>
-                <div class="col-sm-3"
+                <div id="detail_editing_panel" class="col-sm-3"
                      style="display:<?php echo $isEdit == '0' ? 'none' : 'block'; ?>; border: 1px solid;height: 600px;">
 
                     <div class="point-list-view">

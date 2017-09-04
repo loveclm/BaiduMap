@@ -46,9 +46,9 @@
                     <tr style="background-color: lightslategrey;">
                         <th>旅游线路名称</th>
                         <th width="">具体线路</th>
-                        <th width="100">价格</th>
-                        <th width="100">状态</th>
-                        <th width="150">操作</th>
+                        <th width="">价格</th>
+                        <th width="">状态</th>
+                        <th width="">操作</th>
                     </tr>
                     </thead>
                     <tbody id="content_tbl">

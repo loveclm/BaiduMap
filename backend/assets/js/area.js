@@ -93,7 +93,7 @@ function searchArea_jingqu(url) {
 
 function test_api111() {
     var posi = [116.404845, 39.898345];
-    var id = '1200000017';
+    var id = '1200000018';
     var phone = '12345678901';
     $.ajax({
         type: 'POST',
@@ -120,16 +120,17 @@ function test_api111() {
 
 function test_api() {
     var posi = [116.404845, 39.898345];
-    var id = '1200000040';
-    var phone = '11111111111';
+    var id = '1200000023';
+    var phone = '24562456245';
     var cost = '00505000007';
     var cost = '6';
-    var type = '4';
-    var shopid = '0';
+    var type = '3';
+    var shopid = '6';
     $.ajax({
         type: 'POST',
-        url: 'http://www.ayoubc.com/backend/api/Areas/getMyOrderInfos',
-        //url: 'http://192.168.2.18/backend/api/Areas/getMyOrderInfos',
+        //url: 'http://www.ayoubc.com/backend/api/Areas/getMyOrderInfos',
+//        url: 'http://192.168.2.18/backend/api/Areas/setAreaBuyOrder',
+        url: 'http://www.ayoubc.com/backend/api/Areas/setPayOrder',
         dataType: 'json',
         username: 'admin',
         password: '1234',

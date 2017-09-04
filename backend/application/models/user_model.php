@@ -46,6 +46,7 @@ class user_model extends CI_Model
             $this->db->where($likeCriteria);
         }
         $this->db->where('BaseTbl.isDeleted', 0);
+        $this->db->where('BaseTbl.roleId <> 2');
         //$this->db->where('BaseTbl.roleId !=', 1);
         $this->db->limit($page, $segment);
         $query = $this->db->get();
@@ -65,6 +66,8 @@ class user_model extends CI_Model
     {
         $this->db->select('*');
         $this->db->from('tbl_roles');
+//        $this->db->where("roleId <> 2");
+
         $query = $this->db->get();
 
         $result = $query->result();
@@ -124,12 +127,25 @@ class user_model extends CI_Model
         return $query->result();
     }
 
+    function findAllUsersByEmail($email)
+    {
+        $this->db->select("*");
+        $this->db->from("tbl_users");
+        $this->db->where("email", $email);
+        $query = $this->db->get();
+
+        return $query->result();
+    }
+
     /**
      * This function is used to add new user to system
      * @return number $insert_id : This is last inserted id
      */
     function addNewUser($userInfo)
     {
+        $users = $this->findAllUsersByEmail($userInfo['email']);
+        if(count($users)>0)
+            return 0;
         $this->db->trans_start();
         $this->db->insert('tbl_users', $userInfo);
 
@@ -194,7 +210,7 @@ class user_model extends CI_Model
     function addNewRole($name)
     {
         $result = count($this->roleListing());
-        if ($result >= 10) {
+        if ($result >= 11) {
             return '0';
         } else {
             $item = [
@@ -274,6 +290,19 @@ class user_model extends CI_Model
     function editUser($userInfo, $userId)
     {
         $this->db->where('userId', $userId);
+        $this->db->update('tbl_users', $userInfo);
+
+        return TRUE;
+    }
+
+    /**
+     * This function is used to update the user information
+     * @param array $userInfo : This is users updated information
+     * @param number $userId : This is user id
+     */
+    function updateUser($userInfo, $useremail)
+    {
+        $this->db->where('email', $useremail);
         $this->db->update('tbl_users', $userInfo);
 
         return TRUE;

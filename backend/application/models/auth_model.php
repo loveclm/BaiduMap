@@ -16,19 +16,20 @@ class auth_model extends CI_Model
         $this->db->from('tbl_authcode as au');
         $this->db->join('shop as sh', 'au.shopid = sh.id');
         $this->db->join('tourist_area as tr', 'au.targetid = tr.id');
-        if ($name == 'ALL') $name = '';
-        if ($searchType == 0) {
+        if ($searchType == 0 && $name != 'ALL') {
             $likeCriteria = "(sh.name  LIKE '%" . $name . "%')";
             $this->db->where($likeCriteria);
         } else {
-            $likeCriteria = "(tr.name  LIKE '%" . $name . "%')";
-            $this->db->where($likeCriteria);
+            //$likeCriteria = "(tr.name  LIKE '%" . $name . "%')";
+            //$this->db->where($likeCriteria);
         }
         if ($status == 2) {
             $this->db->where('au.price', 0);
         } elseif ($status == 1) {
             $this->db->where("au.price > '0'");
         }
+        $this->db->where('sh.status','0');
+
         //$this->db->where("au.status",'0');
         $this->db->order_by('au.created_time', 'desc');
         $query = $this->db->get();

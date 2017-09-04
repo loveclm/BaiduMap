@@ -26,19 +26,20 @@
                     <div class="container">
                         <div class="row">
                             <div class="col-xs-4 col-sm-4 form-inline">
-                                <div class="form-group area-search-name-view">
-                                    <div class="form-group">
-                                        <select class="form-control" id="searchType">
-                                            <option value="0" <?php if ($searchType == 0) echo 'selected' ?>>商家账号
-                                            </option>
-                                            <option value="1" <?php if ($searchType == 1) echo 'selected' ?>>商家名称
-                                            </option>
-                                        </select>
+                                    <div class="form-group area-search-name-view"
+                                        style="display: <?php echo $shop_manager_number == ''?'block':'none';?>">
+                                        <div class="form-group">
+                                            <select class="form-control" id="searchType">
+                                                <option value="0" <?php if ($searchType == 0) echo 'selected' ?>>商家账号
+                                                </option>
+                                                <option value="1" <?php if ($searchType == 1) echo 'selected' ?>>商家名称
+                                                </option>
+                                            </select>
+                                        </div>
+                                        <input type="text" id="searchName"
+                                               value="<?php echo $searchName == 'ALL' ? '' : $searchName; ?>"
+                                               class="form-control">
                                     </div>
-                                    <input type="text" id="searchName"
-                                           value="<?php echo $searchName == 'ALL' ? '' : $searchName; ?>"
-                                           class="form-control">
-                                </div>
                             </div>
 
                             <div class="col-xs-6 col-sm-6 form-inline">
@@ -71,8 +72,13 @@
                                 <thead>
                                 <tr style="background-color: lightslategrey;">
                                     <th width="100">年月份</th>
-                                    <th width="150">商家账号</th>
-                                    <th width="">商家名称</th>
+                                    <?php
+                                    if ($shop_manager_number == '') {
+                                        ?>
+                                        <th width="150">商家账号</th>
+                                        <th width="">商家名称</th>
+                                        <?php
+                                    } ?>
                                     <th width="">结算金额(元)</th>
                                     <th width="">平台提成(元)</th>
                                     <th width="">实际结算金额(元)</th>
@@ -87,7 +93,7 @@
                                 $sumSettled = 0;
                                 $sumFee = 0;
                                 for ($i = 0; $i <= $Count; $i++) {
-                                    if(!isset($buyList[$i])) continue;
+                                    if (!isset($buyList[$i])) continue;
                                     $item = $buyList[$i];
                                     $shops = $item['shops'];
                                     $j = 0;
@@ -108,8 +114,14 @@
                                             $sumSettled += $settle;
                                             ?>
                                             <?php echo ($j != 1) ? '<tr>' : ''; ?>
-                                            <td><?php echo $sh->phonenumber; ?></td>
-                                            <td><?php echo $sh->name; ?></td>
+
+                                            <?php
+                                            if ($shop_manager_number == '') {
+                                                ?>
+                                                <td><?php echo $sh->phonenumber; ?></td>
+                                                <td><?php echo $sh->name; ?></td>
+                                                <?php
+                                            } ?>
                                             <td><?php echo $price; ?></td>
                                             <td><?php echo $fee; ?></td>
                                             <td><?php echo $settle; ?></td>
@@ -117,7 +129,7 @@
                                                 echo $status == 0 ? '未结算' : '已结算'; ?>
                                             </td>
                                             <td>
-                                                <a href="#" onclick="settleBuyDetail('<?php echo base_url(); ?>');">查看订单
+                                                <a href="#" onclick="settleBuyDetail('<?php echo base_url(); ?>','<?php echo $sh->id; ?>');">查看订单
                                                     &nbsp;</a>
                                                 <?php
                                                 if ($status == 0) {
@@ -139,8 +151,13 @@
                                 ?>
                                 <tr style="background: #fd8f23;">
                                     <td>合计</td>
-                                    <td>---</td>
-                                    <td>---</td>
+                                    <?php
+                                    if ($shop_manager_number == '') {
+                                        ?>
+                                        <td>---</td>
+                                        <td>---</td>
+                                        <?php
+                                    } ?>
                                     <td><?php echo $sumTotal; ?></td>
                                     <td><?php echo $sumFee; ?></td>
                                     <td><?php echo $sumSettled; ?></td>
@@ -156,8 +173,12 @@
                                     </p>
 
                                     <div class="form-group">
-                                        <button class="btn btn-default" onclick="$('#custom-confirm-deploy-view').hide();">取消</button>
-                                        <button class="btn btn-primary" onclick="performBuySettle('<?php echo base_url(); ?>', 1);">确定</button>
+                                        <button class="btn btn-default"
+                                                onclick="$('#custom-confirm-deploy-view').hide();">取消
+                                        </button>
+                                        <button class="btn btn-primary"
+                                                onclick="performBuySettle('<?php echo base_url(); ?>', 1);">确定
+                                        </button>
                                         <input id="current-month-name" style="display: none;"/>
                                         <input id="current-shop-id" style="display: none;"/>
                                     </div>
@@ -175,19 +196,22 @@
                     <div class="container">
                         <div class="row">
                             <div class="col-xs-4 col-sm-4 form-inline">
-                                <div class="form-group area-search-name-view">
-                                    <div class="form-group">
-                                        <select class="form-control" id="searchTypeAuth">
-                                            <option value="0" <?php if ($searchTypeAuth == 0) echo ' selected'; ?> >商家账号
-                                            </option>
-                                            <option value="1" <?php if ($searchTypeAuth == 1) echo ' selected'; ?> >商家名称
-                                            </option>
-                                        </select>
+                                    <div class="form-group area-search-name-view"
+                                         style="display: <?php echo $shop_manager_number == ''?'block':'none'; ?>">
+                                        <div class="form-group">
+                                            <select class="form-control" id="searchTypeAuth">
+                                                <option value="0" <?php if ($searchTypeAuth == 0) echo ' selected'; ?> >
+                                                    商家账号
+                                                </option>
+                                                <option value="1" <?php if ($searchTypeAuth == 1) echo ' selected'; ?> >
+                                                    商家名称
+                                                </option>
+                                            </select>
+                                        </div>
+                                        <input type="text" id="searchNameAuth"
+                                               value="<?php echo $searchNameAuth == 'ALL' ? '' : $searchNameAuth; ?>"
+                                               class="form-control">
                                     </div>
-                                    <input type="text" id="searchNameAuth"
-                                           value="<?php echo $searchNameAuth == 'ALL' ? '' : $searchNameAuth; ?>"
-                                           class="form-control">
-                                </div>
                             </div>
 
                             <div class="col-xs-6 col-sm-6 form-inline">
@@ -218,13 +242,18 @@
                             <table class="table table-bordered area-result-view">
                                 <thead>
                                 <tr style="background-color: lightslategrey;">
-                                    <th width="100">年月份</th>
-                                    <th width="">商家账号</th>
-                                    <th width="">商家名称</th>
+                                    <th width="">年月份</th>
+                                    <?php
+                                    if ($shop_manager_number == '') {
+                                        ?>
+                                        <th width="">商家账号</th>
+                                        <th width="">商家名称</th>
+                                        <?php
+                                    } ?>
                                     <th width="">使用授权码</th>
                                     <th width="">结算金额</th>
-                                    <th width="100">状态</th>
-                                    <th width="150">操作</th>
+                                    <th width="">状态</th>
+                                    <th width="">操作</th>
                                 </tr>
                                 </thead>
                                 <tbody id="content_tbl_2">
@@ -233,7 +262,7 @@
                                 $sumTotal = 0;
                                 $sumCount = 0;
                                 for ($i = 0; $i <= $Count; $i++) {
-                                    if(!isset($authList[$i])) continue;
+                                    if (!isset($authList[$i])) continue;
                                     $item = $authList[$i];
                                     $shops = $item['shops'];
                                     $j = 0;
@@ -255,15 +284,20 @@
                                             $sumCount += $codeCount;
                                             ?>
                                             <?php echo ($j != 1) ? '<tr>' : ''; ?>
-                                            <td><?php echo $sh->phonenumber; ?></td>
-                                            <td><?php echo $sh->name; ?></td>
+                                            <?php
+                                            if ($shop_manager_number == '') {
+                                                ?>
+                                                <td><?php echo $sh->phonenumber; ?></td>
+                                                <td><?php echo $sh->name; ?></td>
+                                                <?php
+                                            } ?>
                                             <td><?php echo $codeCount; ?></td>
                                             <td><?php echo $price; ?></td>
                                             <td><?php
                                                 echo $status == 0 ? '未结算' : '已结算'; ?>
                                             </td>
                                             <td>
-                                                <a href="#" onclick="settleAuthDetail('<?php echo base_url(); ?>');">查看订单
+                                                <a href="#" onclick="settleAuthDetail('<?php echo base_url(); ?>','<?php echo $sh->id; ?>');">查看订单
                                                     &nbsp;</a>
                                                 <?php
                                                 if ($status == 0) {
@@ -283,8 +317,13 @@
                                 <?php } ?>
                                 <tr style="background: #fd8f23;">
                                     <td>合计</td>
-                                    <td>---</td>
-                                    <td>---</td>
+                                    <?php
+                                    if ($shop_manager_number == '') {
+                                        ?>
+                                        <td>---</td>
+                                        <td>---</td>
+                                        <?php
+                                    } ?>
                                     <td><?php echo $sumCount; ?></td>
                                     <td><?php echo $sumTotal; ?></td>
                                     <td>---</td>
@@ -298,7 +337,9 @@
                                         <label>是否结算？</label>
                                     </div>
                                     <div class="form-group">
-                                        <button class="btn btn-default" onclick="$('#custom-generate-auth-view').hide();">取消</button>
+                                        <button class="btn btn-default"
+                                                onclick="$('#custom-generate-auth-view').hide();">取消
+                                        </button>
                                         <button class="btn btn-primary" onclick="showMoney();">确定</button>
                                     </div>
                                 </div>
@@ -310,8 +351,12 @@
                                     </div>
 
                                     <div class="form-group">
-                                        <button class="btn btn-default" onclick="$('#custom-generate-auth-count-view').hide();">取消</button>
-                                        <button class="btn btn-primary" onclick="performAuthSettle('<?php echo base_url(); ?>');">确定</button>
+                                        <button class="btn btn-default"
+                                                onclick="$('#custom-generate-auth-count-view').hide();">取消
+                                        </button>
+                                        <button class="btn btn-primary"
+                                                onclick="performAuthSettle('<?php echo base_url(); ?>');">确定
+                                        </button>
                                     </div>
                                 </div>
                             </div>

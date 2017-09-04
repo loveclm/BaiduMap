@@ -19,6 +19,7 @@ class settlemanage extends BaseController
         parent::__construct();
         $this->load->model('settle_model');
         $this->load->model('order_model');
+        $this->load->model('shop_model');
         $this->isLoggedIn();
     }
 
@@ -112,28 +113,34 @@ class settlemanage extends BaseController
                 $sumSettled += $settle;
 
                 $output_html .= (($j != 1) ? '<tr>' : '');
-                $output_html .= '<td>' . $sh->phonenumber . '</td>';
-                $output_html .= '<td>' . $sh->name . '</td>';
+                if ($this->global['shop_manager_number'] == '') {
+                    $output_html .= '<td>' . $sh->phonenumber . '</td>';
+                    $output_html .= '<td>' . $sh->name . '</td>';
+                }
                 $output_html .= '<td>' . $price . '</td>';
                 $output_html .= '<td>' . $fee . '</td>';
                 $output_html .= '<td>' . $settle . '</td>';
                 $output_html .= '<td>' . ($status == 0 ? '未结算' : '已结算') . '</td>';
 
                 $output_html .= '<td>';
-                $output_html .= '<a href="#" onclick="settleBuyDetail(\'' . base_url() . '\')">查看订单&nbsp;&nbsp;</a>';
+                $output_html .= '<a href="#" onclick="settleBuyDetail(\'' . base_url() . '\',\''.$sh->id.'\')">查看订单&nbsp;&nbsp;</a>';
 
-                if ($status == 0) {
-                    $output_html .= '<a href="#" onclick="showConfirmBuy(\'' . $item['month_name'] . '\',\'' . $sh->id . '\')">结算&nbsp;&nbsp;</a>';
-                    $output_html .= '</td>';
+                if ($this->global['shop_manager_number'] == '') {
+                    if ($status == 0) {
+                        $output_html .= '<a href="#" onclick="showConfirmBuy(\'' . $item['month_name'] . '\',\'' . $sh->id . '\')">结算&nbsp;&nbsp;</a>';
+                    }
                 }
+                $output_html .= '</td>';
                 $output_html .= (($j != 1) ? '</tr>' : '');
             }
             $output_html .= '</tr>';
         }
         $output_html .= '<tr style="background: #fd8f23;">';
         $output_html .= '<td>合计</td>';
-        $output_html .= '<td>---</td>';
-        $output_html .= '<td>---</td>';
+        if ($this->global['shop_manager_number'] == '') {
+            $output_html .= '<td>---</td>';
+            $output_html .= '<td>---</td>';
+        }
         $output_html .= '<td>' . $sumTotal . '</td>';
         $output_html .= '<td>' . $sumFee . '</td>';
         $output_html .= '<td>' . $sumSettled . '</td>';
@@ -189,7 +196,7 @@ class settlemanage extends BaseController
             if ($enDate == '0') $enDate = '';
 
             $authList = $this->settle_model->getAuthSettles($searchType,
-                $name, $stDate, $enDate,$this->global['shop_manager_number']);
+                $name, $stDate, $enDate, $this->global['shop_manager_number']);
 
             $ret['data'] = $this->output_auth_listing($authList);
             $ret['status'] = 'success';
@@ -201,51 +208,57 @@ class settlemanage extends BaseController
     {
         $output_html = '';
 
-$Count = count($authList);
-$sumTotal = 0;
-$sumCount = 0;
-for ($i = 0; $i <= $Count; $i++) {
-    if(!isset($authList[$i])) continue;
-    $item = $authList[$i];
-    $shops = $item['shops'];
-    $j = 0;
+        $Count = count($authList);
+        $sumTotal = 0;
+        $sumCount = 0;
+        for ($i = 0; $i <= $Count; $i++) {
+            if (!isset($authList[$i])) continue;
+            $item = $authList[$i];
+            $shops = $item['shops'];
+            $j = 0;
 
             $output_html .= '<tr>';
             $output_html .= '<td rowspan="' . (count($shops) > 0 ? count($shops) : '1') .
                 '" style="vertical-align:middle;">' . $item['month_name'] . '</td>';
-    foreach ($shops as $sh) {
-        $j++;
-        $price = floatval($sh->address_2->price);
-        $status = $sh->status != "" ? $sh->status->status : "";
-        if (isset($sh->address_2->codeCount))
-            $codeCount = floatval($sh->address_2->codeCount);
-        else
-            $codeCount = 0;
-        $sumTotal += $price;
-        $sumCount += $codeCount;
+            foreach ($shops as $sh) {
+                $j++;
+                $price = floatval($sh->address_2->price);
+                $status = $sh->status != "" ? $sh->status->status : "";
+                if (isset($sh->address_2->codeCount))
+                    $codeCount = floatval($sh->address_2->codeCount);
+                else
+                    $codeCount = 0;
+                $sumTotal += $price;
+                $sumCount += $codeCount;
 
                 $output_html .= (($j != 1) ? '<tr>' : '');
-                $output_html .= '<td>' . $sh->phonenumber . '</td>';
-                $output_html .= '<td>' . $sh->name . '</td>';
+                if ($this->global['shop_manager_number'] == '') {
+                    $output_html .= '<td>' . $sh->phonenumber . '</td>';
+                    $output_html .= '<td>' . $sh->name . '</td>';
+                }
                 $output_html .= '<td>' . $codeCount . '</td>';
                 $output_html .= '<td>' . $price . '</td>';
                 $output_html .= '<td>' . ($status == 0 ? '未结算' : '已结算') . '</td>';
 
                 $output_html .= '<td>';
-                $output_html .= '<a href="#" onclick="settleAuthDetail(\'' . base_url() . '\')">查看订单&nbsp;&nbsp;</a>';
+                $output_html .= '<a href="#" onclick="settleAuthDetail(\'' . base_url() . '\',\''.$sh->id.'\')">查看订单&nbsp;&nbsp;</a>';
 
-                if ($status == 0) {
-                    $output_html .= '<a href="#" onclick="showConfirmAuth(\'' . $item['month_name'] . '\',\'' . $sh->id . '\')">结算&nbsp;&nbsp;</a>';
-                    $output_html .= '</td>';
+                if ($this->global['shop_manager_number'] == '') {
+                    if ($status == 0) {
+                        $output_html .= '<a href="#" onclick="showConfirmAuth(\'' . $item['month_name'] . '\',\'' . $sh->id . '\')">结算&nbsp;&nbsp;</a>';
+                    }
                 }
+                $output_html .= '</td>';
                 $output_html .= (($j != 1) ? '</tr>' : '');
             }
             $output_html .= '</tr>';
         }
         $output_html .= '<tr style="background: #fd8f23;">';
         $output_html .= '<td>合计</td>';
-        $output_html .= '<td>---</td>';
-        $output_html .= '<td>---</td>';
+        if ($this->global['shop_manager_number'] == '') {
+            $output_html .= '<td>---</td>';
+            $output_html .= '<td>---</td>';
+        }
         $output_html .= '<td>' . $sumCount . '</td>';
         $output_html .= '<td>' . $sumTotal . '</td>';
         $output_html .= '<td>---</td>';
@@ -258,7 +271,7 @@ for ($i = 0; $i <= $Count; $i++) {
     /**
      * This function is used to load the user list
      */
-    function settleBuyDetail($searchType, $name, $stDate, $enDate)
+    function settleBuyDetail($searchType, $name, $stDate, $enDate, $shopid)
     {
         if ($this->isAdmin() == TRUE) {
             $this->loadThis();
@@ -278,6 +291,7 @@ for ($i = 0; $i <= $Count; $i++) {
             $this->global['searchNameAuth'] = $name;
             $this->global['startDateAuth'] = $stDate;
             $this->global['endDateAuth'] = $enDate;
+            $this->global['shop_id'] = $shopid;
             $this->loadViews("settlebuydetail", $this->global, NULL, NULL);
         }
     }
@@ -285,7 +299,7 @@ for ($i = 0; $i <= $Count; $i++) {
     /**
      * This function is used to load the user list
      */
-    function settleAuthDetail($searchType, $name, $stDate, $enDate)
+    function settleAuthDetail($searchType, $name, $stDate, $enDate, $shopid)
     {
         if ($this->isAdmin() == TRUE) {
             $this->loadThis();
@@ -305,6 +319,7 @@ for ($i = 0; $i <= $Count; $i++) {
             $this->global['searchNameAuth'] = $name;
             $this->global['startDateAuth'] = $stDate;
             $this->global['endDateAuth'] = $enDate;
+            $this->global['shop_id'] = $shopid;
             $this->loadViews("settleauthdetail", $this->global, NULL, NULL);
         }
     }

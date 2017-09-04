@@ -76,11 +76,11 @@
                     <thead>
                     <tr style="background-color: lightslategrey;">
                         <th>景区名称</th>
-                        <th width="100">景点个数</th>
-                        <th width="150">景区总价格(元)</th>
+                        <th width="">景点个数</th>
+                        <th width="">景区总价格(元)</th>
                         <th>所属地区</th>
-                        <th width="100">状态</th>
-                        <th width="150">操作</th>
+                        <th width="">状态</th>
+                        <th width="">操作</th>
                     </tr>
                     </thead>
                     <tbody id="content_tbl">

@@ -105,17 +105,17 @@ function getData(data, level) {
 
     var subList = data.districtList;
     var contentSub, curlevel, curList;
-    if($("#provinceName").html()!='') {
+    if ($("#provinceName").html() != '') {
         contentSub = new Option($("#provinceName").html());
         curList = document.querySelector('#province');
         curList.add(contentSub);
     }
-    if($("#cityName").html()!='') {
+    if ($("#cityName").html() != '') {
         contentSub = new Option($("#cityName").html());
         curList = document.querySelector('#city');
         curList.add(contentSub);
     }
-    if($("#districtName").html()!='') {
+    if ($("#districtName").html() != '') {
         contentSub = new Option($("#districtName").html());
         curList = document.querySelector('#district');
         curList.add(contentSub);
@@ -267,7 +267,8 @@ $(document).ready(function () {
                                 leftBottom,   //左下角
                                 rightTop    //右上角
                             ),
-                            zooms: [5, 18]
+                            zooms: [5, 18],
+                            draggable: true
                         });
                         imageLayer.setMap(map);
                     }
@@ -285,6 +286,49 @@ $(document).ready(function () {
         });
 
     }
+
+    //$(function(){
+    //    imageLayer = new AMap.ImageLayer({
+    //        url: 'resource/image/overlay.png',
+    //        bounds: new AMap.Bounds(
+    //            bottom_left,     //左下角
+    //            top_right        //右上角
+    //        ),
+    //        zooms: [15, 18],
+    //        map: map,
+    //        draggable: true
+    //    });
+    //
+    //    var mapMarker = new AMap.Marker({
+    //        map: map,
+    //        position: curPos,
+    //        draggable: true
+    //    });
+    //    var dragging = false;
+    //    mapMarker.on('dragstart', function(e){
+    //        dragging = true;
+    //    });
+    //    mapMarker.on('dragend',function () {
+    //        dragging = false;
+    //    });
+    //    mapMarker.on('mousemove',function(e){
+    //        if(dragging) {
+    //            var target = e['target']['G'];
+    //            var position = [e['lnglat']['lng'], e['lnglat']['lat']];
+    //            // calculate moving amount
+    //            var dx = position[0] - curPos[0];
+    //            var dy = position[1] - curPos[1];
+    //            curPos = position;
+    //            // move overlay
+    //            bottom_left[0] += dx;
+    //            bottom_left[1] += dy;
+    //            top_right[0] += dx;
+    //            top_right[1] += dy;
+    //
+    //            imageLayer.setBounds(new AMap.Bounds(bottom_left, top_right));
+    //        }
+    //    });
+    //});
 
     //upload image for attraction
     $('#upload-point-image').on('change', uploadPointImage);
@@ -419,12 +463,13 @@ $(document).ready(function () {
 
     }
 });
-
+var isNewPoint = 0;
 function showAddPoint() {
 
-    editPoint(addPoint(1));
-//    $('.point-add-view').show();
-//    $('.point-list-view').hide();
+    showPointMarker();
+    isNewPoint = 1;
+    $('.point-add-view').show();
+    $('.point-list-view').hide();
 
     $('#pointname').val('');
     $('#pointdescription').val('');
@@ -436,7 +481,19 @@ function showAddPoint() {
 
 
 }
+var marker = null;
 
+function showPointMarker() {
+
+    markerId = markerId + 1;
+    marker = new AMap.Marker({ //添加自定义点标记
+        map: map,
+        position: map.getCenter(), //基点位置
+        offset: new AMap.Pixel(-17, -42), //相对于基点的偏移位置
+        draggable: true,
+        id: markerId
+    });
+}
 // Add attraction to Tourist Area
 function addPointFromArea(url) {
 
@@ -465,6 +522,7 @@ function addPointFromArea(url) {
                 draggable: true,
                 id: markerId
             });
+
             marker.on('dragend', function (e) {
                 var target = e['target']['G'];
                 var position = [e['lnglat']['lng'], e['lnglat']['lat']];
@@ -514,14 +572,7 @@ function addPoint(param) {
         var ptCenter = map.getCenter();
 
         if (pointIndex == '0') {
-            markerId = markerId + 1;
-            var marker = new AMap.Marker({ //添加自定义点标记
-                map: map,
-                position: ptCenter, //基点位置
-                offset: new AMap.Pixel(-17, -42), //相对于基点的偏移位置
-                draggable: true,
-                id: markerId
-            });
+
             marker.on('dragend', function (e) {
                 var target = e['target']['G'];
                 var position = [e['lnglat']['lng'], e['lnglat']['lat']];
@@ -530,6 +581,7 @@ function addPoint(param) {
             });
 
             marker.on('click', function (e) {
+                isNewPoint = 0;
                 var target = e['target']['G'];
                 var targetId = target['id'];
                 showEditPoint(targetId);
@@ -558,12 +610,15 @@ function addPoint(param) {
             $(pointInfo[5]).val(pointAudio);
             $(pointInfo[6]).val(pointFree);
         }
+    } else {
+        if (isNewPoint == 1)
+            marker.setMap(null);
     }
     return marker;
 }
 // edit Attraction
 function editPoint(e) {
-
+    isNewPoint = 0;
     var targetId = $(e).attr('data-id');
     showEditPoint(targetId);
 }
@@ -619,15 +674,16 @@ function addTouristArea(url, isEdit) {
     var area = $("#areaname").val();
     var rate = parseFloat($("#arearate").val()) / 100;
     var overlay = $('#area-overlay').val();
-    var provinceText=$('#provinceName').html();
-    var cityText=$('#cityName').html();
-    var districtText=$('#districtName').html();
+    var provinceText = $('#provinceName').html();
+    var cityText = $('#cityName').html();
+    var districtText = $('#districtName').html();
+    var pointText = $('#city_Name').val();
     if (districtText == '' || cityText == '' || provinceText == '') {
         window.alert("Please select address correctly.");
         return;
     }
     var address = provinceText + "," +
-        cityText + "," + districtText;
+        cityText + "," + districtText + "," + pointText;
 
     if (area == '') {
         window.alert("Please enter area name.");

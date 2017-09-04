@@ -45,7 +45,7 @@
                     <div class="col-xs-4 col-sm-4 form-inline">
                         <div class="form-group area-search-control-view">
                             <button class="btn btn-primary"
-                                    onclick="searchBuyOrder('<?php echo base_url(); ?>');">
+                                    onclick="searchBuyOrder('<?php echo base_url(); ?>','<?php echo $shop_id; ?>');">
                                 查询
                             </button>
                             <input type="button" class="form-group btn btn-primary"
@@ -58,12 +58,12 @@
                         <table class="table table-bordered area-result-view">
                             <thead>
                             <tr style="background-color: lightslategrey;">
-                                <th width="150">订单编号</th>
-                                <th width="150">手机号</th>
+                                <th width="">订单编号</th>
+                                <th width="">手机号</th>
                                 <th width="">订单金额(元)</th>
                                 <th width="">景区</th>
                                 <th width="">景点</th>
-                                <th width="200">订单时间</th>
+                                <th width="">订单时间</th>
                             </tr>
                             </thead>
                             <tbody>
@@ -72,6 +72,8 @@
                             $Count = count($buyList);
                             for ($i = 0; $i < $Count; $i++) {
                                 $item = $buyList[$i];
+                                if ($item->shop_name != $shop_id) continue;
+
                                 ?>
                                 <tr>
                                     <td><?php echo $item->number; ?></td>

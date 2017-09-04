@@ -13,7 +13,12 @@
                     <div class="form-group area-search-name-view">
                         <div class="form-group">
                             <select class="form-control" id="searchType">
-                                <option value="0" <?php if ($searchType == 0) echo ' selected' ?>>商家名称</option>
+                                <?php
+                                if ($shop_manager_number == '') {
+                                    ?>
+                                    <option value="0" <?php if ($searchType == 0) echo ' selected' ?>>商家名称</option>
+                                    <?php
+                                } ?>
                                 <option value="1" <?php if ($searchType == 1) echo ' selected' ?>>名称</option>
                             </select>
                         </div>
@@ -42,14 +47,19 @@
                 <table class="table table-bordered area-result-view">
                     <thead>
                     <tr style="background-color: lightslategrey;">
-                        <th>商家名称</th>
+                        <?php
+                        if ($shop_manager_number == '') {
+                            ?>
+                            <th>商家名称</th>
+                            <?php
+                        } ?>
                         <th width="">名称</th>
-                        <th width="100">授权码个数</th>
-                        <th width="100">已使用个数</th>
-                        <th width="150">新增时间</th>
-                        <th width="100">付款方式</th>
-                        <th width="120">付款金额(元)</th>
-                        <th width="150">操作</th>
+                        <th width="">授权码个数</th>
+                        <th width="">已使用个数</th>
+                        <th width="">新增时间</th>
+                        <th width="">付款方式</th>
+                        <th width="">付款金额(元)</th>
+                        <th width="">操作</th>
                     </tr>
                     </thead>
                     <tbody id="content_tbl">
@@ -60,17 +70,22 @@
 
                         ?>
                         <tr>
-                            <td><?php echo $item->shopName; ?></td>
+                            <?php
+                            if ($shop_manager_number == '') {
+                                ?>
+                                <td><?php echo $item->shopName; ?></td>
+                                <?php
+                            } ?>
                             <td><?php echo $item->tourName; ?></td>
                             <td><?php echo $this->auth_model->getOrderTotal($item->id); ?></td>
                             <td><?php echo $this->auth_model->getOrderUsed($item->id); ?></td>
                             <td><?php echo $item->created; ?></td>
-                            <td><?php echo $item->status!=0?($item->money > 0 ? '先付款' : '后付款'):''; ?></td>
+                            <td><?php echo $item->status != 0 ? ($item->money > 0 ? '先付款' : '后付款') : ''; ?></td>
                             <td><?php echo $item->money > 0 ? $item->money : ''; ?></td>
                             <td>
                                 <a href="<?php echo base_url(); ?>authDetail/<?php echo $item->id; ?>/0">查看 &nbsp;</a>
                                 <?php
-                                if ($item->money == 0) {
+                                if ($item->money == 0 && $shop_manager_number == '') {
                                     ?>
                                     <a href="#" onclick="showSelect(<?php echo $item->id; ?>);"> 付款方式 &nbsp;</a>
                                     <?php
@@ -99,8 +114,10 @@
                         </div>
 
                         <div class="form-group">
-                            <button class="btn btn-primary" onclick="addMoney('<?php echo base_url(); ?>',1 );">确认</button>
-                            <button class="btn btn-default" onclick="$('#custom-generate-auth-count-view').hide();">取消</button>
+                            <button class="btn btn-primary" onclick="addMoney('<?php echo base_url(); ?>',1 );">确认
+                            </button>
+                            <button class="btn btn-default" onclick="$('#custom-generate-auth-count-view').hide();">取消
+                            </button>
                         </div>
                     </div>
                     <div id="savingId" style="display: none;"></div>

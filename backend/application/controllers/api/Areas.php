@@ -424,8 +424,6 @@ class Areas extends REST_Controller
                     "areaid" => $areaid,
                     "authid" => $shopid,
                     "ordered_time" => $date->format('Y-m-d H:i:s'),
-                    "paid_time" => $date->format('Y-m-d H:i:s'),
-                    "expiration_time" => date_modify($date, "+20 days")->format('Y-m-d H:i:s')
                 ];
                 $this->order_model->AddBuyOrder($authOrderItem);
             } else if ($type == '3') {  // 3-attraction
@@ -440,22 +438,17 @@ class Areas extends REST_Controller
                     "authid" => $shopid,
                     "attractionid" => $areaid,
                     "ordered_time" => $date->format('Y-m-d H:i:s'),
-                    "paid_time" => $date->format('Y-m-d H:i:s'),
-                    "expiration_time" => date_modify($date, "+20 days")->format('Y-m-d H:i:s')
                 ];
                 $this->order_model->AddBuyOrder($authOrderItem);
             } else { // 4-authorization code
                 if ($shopid != '') {
                     $authOrderItem = [
-                        "code" => floor($cost * 100) / 100,
+                        "value" => $areaid,
                         "userphone" => $phone,
                         "ordertype" => $type, // 4-authorization
                         "status" => '1', // ordered and paid
-                        "areaid" => $areaid,
                         "authid" => $shopid,
-                        "ordered_time" => $date->format('Y-m-d H:i:s'),
-                        "paid_time" => $date->format('Y-m-d H:i:s'),
-                        "expiration_time" => date_modify($date, "+20 days")->format('Y-m-d H:i:s')
+                        "paid_time" => $date->format('Y-m-d H:i:s')
                     ];
                     if (!$this->order_model->AddAuthOrder($authOrderItem))
                         $this->response(array('status' => false, 'result' => '-1'), 200);
@@ -472,7 +465,7 @@ class Areas extends REST_Controller
         $phone = $request['phone'];
         $shopid = $request['shop'];
 
-        $result = $this->order_model->addPayOrder($value, $phone);
+        $result = $this->order_model->addPayOrder($value, $phone, $shopid);
         if ($result == FALSE) {
             $this->response(array('status' => false, 'result' => '-1'), 200);
         } else {

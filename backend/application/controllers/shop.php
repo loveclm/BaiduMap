@@ -73,7 +73,6 @@ class shop extends BaseController
     {
         $this->global['pageTitle'] = '商家管理';
         $this->global['shopList'] = $this->shop_model->getShops('','all',0,$this->global['shop_manager_number']);
-        $this->global['userList'] = $this->user_model->getAllUsers(2);// get shop managers
         $this->global['areaList'] = $this->area_model->getAreas('', 'all', '1'); //1-available, 2-disable
         $this->global['courseList'] = $this->area_model->getCourses('', '1'); //1-available, 2-disable
         $this->global['searchName'] = '';
@@ -180,7 +179,6 @@ class shop extends BaseController
         } else {
             $this->global['pageTitle'] = '新增商家';
             $this->global['areaList'] = $this->area_model->getAreas();
-            $this->global['userList'] = $this->user_model->getAllUsers(2);// get shop managers
             $this->loadViews("shop-add", $this->global, NULL, NULL);
         }
     }
@@ -247,7 +245,6 @@ class shop extends BaseController
         } else {
             $this->global['pageTitle'] = '编辑商家';
             $this->global['shop'] = $this->shop_model->getShopById($id);
-            $this->global['userList'] = $this->user_model->getAllUsers(2);// get shop managers
 
             $this->loadViews("shop-add", $this->global, NULL, NULL);
         }
