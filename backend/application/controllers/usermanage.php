@@ -20,6 +20,7 @@ class usermanage extends BaseController
         $this->load->model('collection_model');
         $this->load->model('order_model');
         $this->load->model('area_model');
+        $this->load->model('shop_model');
         $this->isLoggedIn();
     }
 

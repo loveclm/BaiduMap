@@ -83,6 +83,9 @@
 .custom-info-row {
     padding-bottom: 10px;
 }
+.custom-info-row select{
+    height:27px;
+}
 .custom-course-itemlist-view {
     padding: 0px;
     border: 0px solid;
@@ -114,6 +117,6 @@
 }
 #tip select{
     width:100px;
-    height:30px;
+    height:35px;
 }
 

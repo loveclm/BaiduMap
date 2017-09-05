@@ -333,12 +333,12 @@
                 <div class="col-sm-8">
                     <div class="form-group col-md-12" style="position: absolute; z-index: 1000;">
                         <input class="btn btn-default" id="city_Name" type="text" placeholder="输入您要定位的地址"
-                               value="<?php echo isset($addrs[3])!='' ? ($addrs[3]) : ''; ?>"/>
+                               value="<?php echo isset($addrs[3])!='' ? ($addrs[3]) : ''; ?>" />
 
                         <input id="area-position" style="display: none;"
                                value="<?php echo isset($area) ? json_encode($areaInfo->position) : ''; ?>"/>
-                        <a href="#" class="btn btn-default" onclick="$('#detail_editing_panel').show();">
-                            <i class="fa fa-search"></i>
+                        <a href="#" class="btn btn-default" onclick="searchMapArea();">
+                            <i class="fa fa-edit"></i>
                         </a>
                     </div>
                     <!-- ////////////////////GaoDe Map Part  -->
@@ -439,4 +439,5 @@
 <!--////////////////////////// -->
 <script
     src="http://webapi.amap.com/maps?v=1.3&key=0250860ccb5953fa5d655e8acf40ebb7&plugin=AMap.PolyEditor,AMap.MouseTool,AMap.DistrictSearch"></script>
+<script src="http://webapi.amap.com/ui/1.0/main.js?v=1.0.10"></script>
 <script type="text/javascript" src="<?php echo base_url(); ?>assets/js/map.js" charset="utf-8"></script>

@@ -51,20 +51,29 @@
 
                         $Count = count($userList);
                         $sumPaid = $sumBuy = $sumAuth = $Auth = $Buy = 0;
-                        if($userList!='') {
+                        if ($userList != '') {
+                            if ($shop_manager_number != '') {
+                                $shop = $this->shop_model->getShopIdByNumber($shop_manager_number);
+                                $shopid = $shop->id;
+                            } else {
+                                $shopid = '';
+                            }
+                            $j=0;
                             for ($i = 0; $i < $Count; $i++) {
                                 $item = $userList[$i];
                                 $mobile = $item->mobile;
-                                $Buy = $this->collection_model->getBuyOrderPaid($mobile);
+                                $Buy = $this->collection_model->getBuyOrderPaid($mobile, $shopid);
                                 $sumBuy += $Buy;
-                                $Auth = $this->collection_model->getAuthOrderPaid($mobile);
+                                $Auth = $this->collection_model->getAuthOrderPaid($mobile, $shopid);
                                 $sumAuth += $Auth;
+                                if ($Buy == 0 && $Auth == 0) continue;
+                                $j++;
                                 $Paid = $this->order_model->getMyOrderInfos($mobile);
                                 $Paid = $Paid == '-1' ? '0' : $Paid['total_price'];
                                 $sumPaid += $Paid;
                                 ?>
                                 <tr>
-                                    <td><?php echo $i + 1; ?></td>
+                                    <td><?php echo $j; ?></td>
                                     <td><?php echo $item->mobile; ?></td>
                                     <td><?php echo $Buy; ?></td>
                                     <td><?php echo $Auth; ?></td>

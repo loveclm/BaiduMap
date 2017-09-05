@@ -182,9 +182,53 @@ function search(obj) {
         }
     });
 }
+
 function setCenter(obj) {
     map.setCenter(obj[obj.options.selectedIndex].center);
 }
+
+
+AMapUI.loadUI(['misc/PoiPicker'], function (PoiPicker) {
+    $('#city_Name').on('change', searchCity);
+    function searchCity(event) {
+        var poiPicker = new PoiPicker({
+            input: 'city_Name',
+            placeSearchOptions: {
+                map: map,
+                pageSize: 5
+            }
+        });
+        poiPicker.on("poiPicked", function (poiResult) {
+
+            poiPicker.hideSearchResults();
+            var source = poiResult.source,
+                poi = poiResult.item;
+
+            if (source !== 'search') {
+
+                //suggest来源的，同样调用搜索
+                poiPicker.searchByKeyword(poi.name);
+
+            } else {
+
+                //console.log(poi);
+            }
+            currentLocation = [poi['location']['lng'], poi['location']['lat']];
+            map.setCenter(currentLocation);
+            var position = currentLocation;
+
+            leftBottom = [position[0] - .001, position[1] - .001];
+            rightTop = [position[0] + .001, position[1] + .001];
+
+            imageLayer.setBounds(new AMap.Bounds(leftBottom, rightTop));
+            cornerLocation = [rightTop[0], leftBottom[1]];
+            mapMarker.setPosition(currentLocation);
+            mapMarker1.setPosition(cornerLocation);
+            var arr = [leftBottom, rightTop];
+            $('#area-position').val(JSON.stringify(arr));
+        });
+    }
+});
 
 // Code included inside $( document ).ready() will only run once the page Document Object Model (DOM) is ready for JavaScript code to execute
 $(document).ready(function () {
@@ -390,30 +434,37 @@ $(document).ready(function () {
     /*
      Event code that find string for Search of Tourist Area
      */
-    AMap.plugin('AMap.Autocomplete', function () {//回调函数
-        var autoOptions = {
-            city: "", //城市，默认全国
-            input: "city_Name"//使用联想输入的input的id
-        };
-        var autocomplete = new AMap.Autocomplete(autoOptions);
+    //AMap.plugin('AMap.Autocomplete', function () {//回调函数
+    //    var autoOptions = {
+    //        //city: "", //城市，默认全国
+    //        input: "city_Name"//使用联想输入的input的id
+    //    };
+    //    var autocomplete = new AMap.Autocomplete(autoOptions);
+    //    var placeSearch = new AMap.PlaceSearch({
+    //        map:map
+    //    });
+    //
+    //    AMap.event.addListener(autocomplete, "select", function (data) {
+    //        console.log(data);
+    //        currentLocation = [data['poi']['location']['lng'], data['poi']['location']['lat']];
+    //        map.setCenter(currentLocation);
+    //        var position = currentLocation;
+    //
+    //        leftBottom = [position[0] - .001, position[1] - .001];
+    //        rightTop = [position[0] + .001, position[1] + .001];
+    //
+    //        imageLayer.setBounds(new AMap.Bounds(leftBottom, rightTop));
+    //        cornerLocation = [rightTop[0], leftBottom[1]];
+    //        mapMarker.setPosition(currentLocation);
+    //        mapMarker1.setPosition(cornerLocation);
+    //        var arr = [leftBottom, rightTop];
+    //        $('#area-position').val(JSON.stringify(arr));
+    //    });
+    //});
 
-        AMap.event.addListener(autocomplete, "select", function (data) {
-            console.log(data);
-            currentLocation = [data['poi']['location']['lng'], data['poi']['location']['lat']];
-            map.setCenter(currentLocation);
-            var position = currentLocation;
+    /////////////////////////////////////////////////////
 
-            leftBottom = [position[0] - .001, position[1] - .001];
-            rightTop = [position[0] + .001, position[1] + .001];
 
-            imageLayer.setBounds(new AMap.Bounds(leftBottom, rightTop));
-            cornerLocation = [rightTop[0], leftBottom[1]];
-            mapMarker.setPosition(currentLocation);
-            mapMarker1.setPosition(cornerLocation);
-            var arr = [leftBottom, rightTop];
-            $('#area-position').val(JSON.stringify(arr));
-        });
-    });
     /*
      Event code that upload overlay image to Tourist Area
      */
@@ -586,7 +637,6 @@ $(document).ready(function () {
                 // STOP LOADING SPINNER
             }
         });
-
     }
 
     //upload audio for attraction
@@ -992,4 +1042,10 @@ function uploadPointAudio() {
 }
 function uploadAreaAudio() {
     $('#upload-area-audio').click();
+}
+function searchMapArea() {
+    var city = $("#city_Name").val();
+    $("#city_Name").val('');
+    $('#detail_editing_panel').show();
+    $("#city_Name").val(city);
 }

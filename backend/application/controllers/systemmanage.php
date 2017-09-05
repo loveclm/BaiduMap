@@ -46,7 +46,6 @@ class systemmanage extends BaseController
         } else {
             $searchText = $this->input->post('searchText');
             $searchStatus = $this->input->post('searchStatus');
-            $data['searchText'] = $searchText;
 
             $this->load->library('pagination');
 
@@ -59,10 +58,8 @@ class systemmanage extends BaseController
 
             $this->global['pageTitle'] = '人员管理';
             $this->global['pageType'] = 'user';
-            $this->global['areaList'] = $this->area_model->getAreas($name, $address, $status);
-            $this->global['searchName'] = $name;
-            $this->global['searchAddress'] = $address;
-            $this->global['searchStatus'] = $status;
+            $data['searchText'] = $searchText;
+            $data['searchStatus'] = $status;
 
             $this->loadViews("systemusermanage", $this->global, $data, NULL);
         }

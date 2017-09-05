@@ -19,7 +19,7 @@
                             </div>
                             <div class="input-group">
                                 <input type="text" id="searchName" name="searchText"
-                                       value="<?php echo $searchName == 'all' ? '' : $searchName; ?>"
+                                       value="<?php echo $searchText == 'all' ? '' : $searchText; ?>"
                                        class="form-control pull-right"
                                        placeholder=""/>
                             </div>

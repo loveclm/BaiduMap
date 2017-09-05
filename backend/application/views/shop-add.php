@@ -36,9 +36,9 @@
                 $address = isset($shop) ? ($shop->address_1) : '';
                 $addrs = explode(',', $address);
                 ?>
-                <select id='province' onchange='search(this)'></select>
-                <select id='city' onchange='search(this)'></select>
-                <select id='district' onchange='search(this)'></select>
+                <select id='province' onchange='search(this)' style="height: 26px;"></select>
+                <select id='city' onchange='search(this)' style="height: 26px;"></select>
+                <select id='district' onchange='search(this)' style="height: 26px;"></select>
                 <select id='street' onchange='setCenter(this)' style="display: none;"></select>
 
                 <div id="provinceName" style="display: none;"><?php echo $address != '' ? ($addrs[0]) : ''; ?></div>

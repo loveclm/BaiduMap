@@ -67,6 +67,21 @@ class shop_model extends CI_Model
     }
 
     /**
+     * This function is used to get Tourist Area by id
+     * @return array $result : This is result
+     */
+    function getShopIdByNumber($number)
+    {
+        $this->db->select('id');
+        $this->db->from('shop');
+        $this->db->where('phonenumber', $number);
+        $query = $this->db->get();
+        $result = $query->result();
+        if (count($result)>0) return $result[0];
+        return NULL;
+    }
+
+    /**
      * This function is used to add new shop to system
      * @return number $insert_id : This is last inserted id
      */
