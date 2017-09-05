@@ -5,11 +5,10 @@
 
 // variables for AMap
 var map = null; // AMap pointer
-var imageLayer = null;
 var state = 'new';
 // selected position
-var leftBottom = [];
-var rightTop = [];
+var leftBottom = [116.391541, 39.913155];
+var rightTop = [116.402635, 39.92223931];
 
 // current position
 var currentLocation = [];
@@ -26,7 +25,12 @@ var district, polygons = [], citycode;
 var citySelect, districtSelect, areaSelect;
 
 var opts;
-
+var imageLayer = null;
+var mapMarker = null;
+var mapMarker1 = null;
+var dragging = false;
+var dragging1 = false;
+var cornerLocation = [];
 
 /* function: initMap
  description: Init AMap using center position and add AMap.MouseTool plugin
@@ -55,23 +59,25 @@ function initMap(center) {
         }
     });
 
-    var mouseTool = new AMap.MouseTool(map); //在地图中添加MouseTool插件
-    var drawRectangle = mouseTool.rectangle(); //用鼠标工具画矩形
+    //var mouseTool = new AMap.MouseTool(map); //在地图中添加MouseTool插件
+    //var drawRectangle = mouseTool.rectangle(); //用鼠标工具画矩形
     isFirst = true;
-    AMap.event.addListener(mouseTool, 'draw', function (e) {
-        if (!isFirst) return;
-        mouseTool.close();
-        isFirst = false;
-        var path = e.obj.getPath();
-        leftBottom = [path[3].lng, path[3].lat];
-        rightTop = [path[1].lng, path[1].lat];
-        var arr = [leftBottom, rightTop];
-        console.log(e.obj.getPath());//获取路径
-        $('#area-position').val(JSON.stringify(arr));
-    });
+    //AMap.event.addListener(mouseTool, 'draw', function (e) {
+    //    if (!isFirst) return;
+    //    mouseTool.close();
+    //    isFirst = false;
+    //    var path = e.obj.getPath();
+    //    leftBottom = [path[3].lng, path[3].lat];
+    //    rightTop = [path[1].lng, path[1].lat];
+    //
+    //    var arr = [leftBottom, rightTop];
+    //    console.log(e.obj.getPath());//获取路径
+    //    $('#area-position').val(JSON.stringify(arr));
+    //});
 
 
 }
+
 
 function getData(data, level) {
     var bounds = data.boundaries;
@@ -86,8 +92,23 @@ function getData(data, level) {
                 path: bounds[i]
             });
             polygons.push(polygon);
+            map.setFitView();//地图自适应
+            var pos = map.getCenter();
+            currentLocation = [pos['lng'], pos['lat']];
+            console.log(currentLocation);
+            var position = currentLocation;
+
+            leftBottom = [position[0] - .001, position[1] - .001];
+            rightTop = [position[0] + .001, position[1] + .001];
+
+            imageLayer.setBounds(new AMap.Bounds(leftBottom, rightTop));
+            cornerLocation = [rightTop[0], leftBottom[1]];
+            mapMarker.setPosition(currentLocation);
+            mapMarker1.setPosition(cornerLocation);
+            var arr = [leftBottom, rightTop];
+            $('#area-position').val(JSON.stringify(arr));
         }
-        map.setFitView();//地图自适应
+
     }
 
 
@@ -162,15 +183,25 @@ function search(obj) {
     });
 }
 function setCenter(obj) {
-    map.setCenter(obj[obj.options.selectedIndex].center)
+    map.setCenter(obj[obj.options.selectedIndex].center);
 }
 
 // Code included inside $( document ).ready() will only run once the page Document Object Model (DOM) is ready for JavaScript code to execute
 $(document).ready(function () {
 
+    mapMarker = null;
+    mapMarker1 = null;
+    imageLayer = null;
+    dragging = false;
+    dragging1 = false;
+    cornerLocation = [];
+    map = null;
+
+    currentLocation = [(leftBottom[0] + rightTop[0]) / 2, (leftBottom[1] + rightTop[1]) / 2];
+    cornerLocation = [rightTop[0], leftBottom[1]];
     var position = $('#area-position').val();
     if (position != '' && position != undefined) {
-        currentLocation = [116.403322, 39.900255];
+
         initMap(currentLocation);
         var positionObj = JSON.parse(position);
         var url = $('#custom-base-url').val();
@@ -178,35 +209,184 @@ $(document).ready(function () {
 
         leftBottom = positionObj[0];
         rightTop = positionObj[1];
-
+        cornerLocation = [rightTop[0], leftBottom[1]];
+        currentLocation = [(leftBottom[0] + rightTop[0]) / 2, (leftBottom[1] + rightTop[1]) / 2];
         var overlay = $('#area-overlay').val();
-        var imageLayer = new AMap.ImageLayer({
-            url: url + 'uploads/' + overlay,
-            bounds: new AMap.Bounds(
-                leftBottom,   //左下角
-                rightTop    //右上角
-            ),
-            zooms: [5, 18]
-        });
-
+        //var imageLayer = new AMap.ImageLayer({
+        //    url: url + 'uploads/' + overlay,
+        //    bounds: new AMap.Bounds(
+        //        leftBottom,   //左下角
+        //        rightTop    //右上角
+        //    ),
+        //    zooms: [5, 18]
+        //});
         map = new AMap.Map('custom-map-container', {
             resizeEnable: true,
-            center: leftBottom,
-            zoom: 16,
-            layers: [
-                new AMap.TileLayer(),
-                imageLayer
-            ]
+            center: currentLocation,
+            zoom: 17,
+            scrollWheel: true
+            //layers: [
+            //    new AMap.TileLayer(),
+            //    imageLayer
+            //]
         });
 
+        imageLayer = new AMap.ImageLayer({
+            url: url + 'uploads/' + overlay,
+            bounds: new AMap.Bounds(
+                leftBottom,     //左下角
+                rightTop        //右上角
+            ),
+            zooms: [2, 18],
+            map: map
+        });
+        mapMarker = new AMap.Marker({
+            map: map,
+            icon: base_url + 'assets/images/control.png',
+            offset: new AMap.Pixel(-20, -20),
+            position: currentLocation,
+            draggable: true
+        });
+        dragging = false;
+        mapMarker.on('dragstart', function (e) {
+            dragging = true;
+        });
+        mapMarker.on('dragend', function () {
+            dragging = false;
+        });
+        mapMarker.on('mousemove', function (e) {
+            if (dragging) {
+                var target = e['target']['G'];
+                var position = [e['lnglat']['lng'], e['lnglat']['lat']];
+                // calculate moving amount
+                var dx = position[0] - currentLocation[0];
+                var dy = position[1] - currentLocation[1];
+                currentLocation = position;
+                // move overlay
+                leftBottom[0] += dx;
+                leftBottom[1] += dy;
+                rightTop[0] += dx;
+                rightTop[1] += dy;
+
+                imageLayer.setBounds(new AMap.Bounds(leftBottom, rightTop));
+                cornerLocation = [rightTop[0], leftBottom[1]];
+                mapMarker1.setPosition(cornerLocation);
+                var arr = [leftBottom, rightTop];
+                $('#area-position').val(JSON.stringify(arr));
+            }
+        });
+        dragging1 = false;
+        mapMarker1 = new AMap.Marker({
+            map: map,
+            icon: base_url + 'assets/images/control.png',
+            offset: new AMap.Pixel(-20, -20),
+            position: cornerLocation,
+            draggable: true
+        });
+        dragging1 = false;
+        mapMarker1.on('dragstart', function (e) {
+            dragging1 = true;
+        });
+        mapMarker1.on('dragend', function () {
+            dragging1 = false;
+        });
+        mapMarker1.on('mousemove', function (e) {
+            if (dragging1) {
+                var target = e['target']['G'];
+                var position = [e['lnglat']['lng'], e['lnglat']['lat']];
+                // move overlay
+                rightTop[0] = position[0];
+                leftBottom[1] = position[1];
+                leftBottom[0] = currentLocation[0] - (position[0] - currentLocation[0]);
+                rightTop[1] = currentLocation[1] - (position[1] - currentLocation[1]);
+
+                imageLayer.setBounds(new AMap.Bounds(leftBottom, rightTop));
+                var arr = [leftBottom, rightTop];
+                $('#area-position').val(JSON.stringify(arr));
+            }
+        });
         addPointFromArea(url);
     }
     else {
         // init AMap
-        currentLocation = [116.403322, 39.900255];
+        currentLocation = [(leftBottom[0] + rightTop[0]) / 2, (leftBottom[1] + rightTop[1]) / 2];
+        cornerLocation = [rightTop[0], leftBottom[1]];
         initMap(currentLocation);
-    }
 
+        imageLayer = new AMap.ImageLayer({
+            url: base_url + 'assets/images/bound.png',
+            bounds: new AMap.Bounds(
+                leftBottom,     //左下角
+                rightTop        //右上角
+            ),
+            zooms: [1, 18],
+            map: map
+        });
+        mapMarker = new AMap.Marker({
+            map: map,
+            icon: base_url + 'assets/images/control.png',
+            offset: new AMap.Pixel(-20, -20),
+            position: currentLocation,
+            draggable: true
+        });
+        dragging = false;
+        mapMarker.on('dragstart', function (e) {
+            dragging = true;
+        });
+        mapMarker.on('dragend', function () {
+            dragging = false;
+        });
+        mapMarker.on('mousemove', function (e) {
+            if (dragging) {
+                var target = e['target']['G'];
+                var position = [e['lnglat']['lng'], e['lnglat']['lat']];
+                // calculate moving amount
+                var dx = position[0] - currentLocation[0];
+                var dy = position[1] - currentLocation[1];
+                currentLocation = position;
+                // move overlay
+                leftBottom[0] += dx;
+                leftBottom[1] += dy;
+                rightTop[0] += dx;
+                rightTop[1] += dy;
+
+                imageLayer.setBounds(new AMap.Bounds(leftBottom, rightTop));
+                cornerLocation = [rightTop[0], leftBottom[1]];
+                mapMarker1.setPosition(cornerLocation);
+                var arr = [leftBottom, rightTop];
+                $('#area-position').val(JSON.stringify(arr));
+            }
+        });
+        mapMarker1 = new AMap.Marker({
+            map: map,
+            icon: base_url + 'assets/images/control.png',
+            offset: new AMap.Pixel(-20, -20),
+            position: cornerLocation,
+            draggable: true
+        });
+        dragging1 = false;
+        mapMarker1.on('dragstart', function (e) {
+            dragging1 = true;
+        });
+        mapMarker1.on('dragend', function () {
+            dragging1 = false;
+        });
+        mapMarker1.on('mousemove', function (e) {
+            if (dragging1) {
+                var target = e['target']['G'];
+                var position = [e['lnglat']['lng'], e['lnglat']['lat']];
+                // move overlay
+                rightTop[0] = position[0];
+                leftBottom[1] = position[1];
+                leftBottom[0] = currentLocation[0] - (position[0] - currentLocation[0]);
+                rightTop[1] = currentLocation[1] - (position[1] - currentLocation[1]);
+
+                imageLayer.setBounds(new AMap.Bounds(leftBottom, rightTop));
+                var arr = [leftBottom, rightTop];
+                $('#area-position').val(JSON.stringify(arr));
+            }
+        });
+    }
     /*
      Event code that find string for Search of Tourist Area
      */
@@ -220,7 +400,18 @@ $(document).ready(function () {
         AMap.event.addListener(autocomplete, "select", function (data) {
             console.log(data);
             currentLocation = [data['poi']['location']['lng'], data['poi']['location']['lat']];
-            initMap(currentLocation);
+            map.setCenter(currentLocation);
+            var position = currentLocation;
+
+            leftBottom = [position[0] - .001, position[1] - .001];
+            rightTop = [position[0] + .001, position[1] + .001];
+
+            imageLayer.setBounds(new AMap.Bounds(leftBottom, rightTop));
+            cornerLocation = [rightTop[0], leftBottom[1]];
+            mapMarker.setPosition(currentLocation);
+            mapMarker1.setPosition(cornerLocation);
+            var arr = [leftBottom, rightTop];
+            $('#area-position').val(JSON.stringify(arr));
         });
     });
     /*
@@ -232,6 +423,14 @@ $(document).ready(function () {
         event.stopPropagation(); // Stop stuff happening
         event.preventDefault(); // Totally stop stuff happening
         files = event.target.files;
+        if (this.files[0].type != "image/jpeg" && this.files[0].type != "image/png") {
+            window.alert("图片格式不正确.");
+            return;
+        }
+        if (this.files[0].size > 10000000) {
+            window.alert("图片要不超过10M.");
+            return;
+        }
 
         var data = new FormData();
         $.each(files, function (key, value) {
@@ -287,48 +486,6 @@ $(document).ready(function () {
 
     }
 
-    //$(function(){
-    //    imageLayer = new AMap.ImageLayer({
-    //        url: 'resource/image/overlay.png',
-    //        bounds: new AMap.Bounds(
-    //            bottom_left,     //左下角
-    //            top_right        //右上角
-    //        ),
-    //        zooms: [15, 18],
-    //        map: map,
-    //        draggable: true
-    //    });
-    //
-    //    var mapMarker = new AMap.Marker({
-    //        map: map,
-    //        position: curPos,
-    //        draggable: true
-    //    });
-    //    var dragging = false;
-    //    mapMarker.on('dragstart', function(e){
-    //        dragging = true;
-    //    });
-    //    mapMarker.on('dragend',function () {
-    //        dragging = false;
-    //    });
-    //    mapMarker.on('mousemove',function(e){
-    //        if(dragging) {
-    //            var target = e['target']['G'];
-    //            var position = [e['lnglat']['lng'], e['lnglat']['lat']];
-    //            // calculate moving amount
-    //            var dx = position[0] - curPos[0];
-    //            var dy = position[1] - curPos[1];
-    //            curPos = position;
-    //            // move overlay
-    //            bottom_left[0] += dx;
-    //            bottom_left[1] += dy;
-    //            top_right[0] += dx;
-    //            top_right[1] += dy;
-    //
-    //            imageLayer.setBounds(new AMap.Bounds(bottom_left, top_right));
-    //        }
-    //    });
-    //});
 
     //upload image for attraction
     $('#upload-point-image').on('change', uploadPointImage);
@@ -336,7 +493,14 @@ $(document).ready(function () {
         event.stopPropagation(); // Stop stuff happening
         event.preventDefault(); // Totally stop stuff happening
         files = event.target.files;
-
+        if (this.files[0].type != "image/jpeg" && this.files[0].type != "image/png") {
+            window.alert("图片格式不正确.");
+            return;
+        }
+        if (this.files[0].size > 10000000) {
+            window.alert("图片要不超过10M.");
+            return;
+        }
         var data = new FormData();
         $.each(files, function (key, value) {
             data.append(key, value);
@@ -378,6 +542,14 @@ $(document).ready(function () {
         event.stopPropagation(); // Stop stuff happening
         event.preventDefault(); // Totally stop stuff happening
         files = event.target.files;
+        if (this.files[0].type != "audio/mp3" && this.files[0].type != "audio/wav") {
+            window.alert("录音格式不正确.");
+            return;
+        }
+        if (this.files[0].size > 60000000) {
+            window.alert("录音要不超过60M.");
+            return;
+        }
 
         $("#pointaudio_view").html('录音上传中...');
 
@@ -424,6 +596,14 @@ $(document).ready(function () {
         event.stopPropagation(); // Stop stuff happening
         event.preventDefault(); // Totally stop stuff happening
         files = event.target.files;
+        if (this.files[0].type != "audio/mp3" && this.files[0].type != "audio/wav") {
+            window.alert("录音格式不正确.");
+            return;
+        }
+        if (this.files[0].size > 60000000) {
+            window.alert("录音要不超过60M.");
+            return;
+        }
 
         $("#area-audio-file").html('录音上传中...');
 

@@ -283,7 +283,7 @@
                 <div class="col-xs-6 col-sm-4 form-inline">
                     <div class="form-group area-add-view">
                         <label for="exampleInputName2">景区名称:</label>
-                        <input type="text" class="form-control" id="areaname"
+                        <input type="text" class="form-control" id="areaname" maxlength="20"
                                value="<?php echo isset($area) ? $area->name : ''; ?>"/>
                         <input type="text" id="point-list" style="display:none;"
                                value="<?php echo isset($area) ? $area->id : ''; ?>"/>
@@ -350,13 +350,13 @@
 
                     <div class="point-list-view">
                         <div class="form-group col-sm-6">
+                            <button class="btn btn-primary" type="button" onclick="showAddPoint();">标记景点</button>
+                        </div>
+                        <div class="form-group col-sm-6">
                             <input id="upload-overlay" type="file" style="display: none;"/>
                             <button class="btn btn-primary" type="button" onclick="uploadOverlay();">上传覆盖图</button>
                             <input id="area-overlay" value="<?php echo isset($area) ? ($areaInfo->overay) : ''; ?>"
                                    style="display: none;"/>
-                        </div>
-                        <div class="form-group col-sm-6">
-                            <button class="btn btn-primary" type="button" onclick="showAddPoint();">标记景点</button>
                         </div>
                         <div class="form-group">
                             <div id="pointList">
@@ -370,11 +370,11 @@
 
                         <div class="form-group">
                             <label>景点名称：</label>
-                            <input type="text" class="form-control" id="pointname">
+                            <input type="text" class="form-control" id="pointname" maxlength="20">
                         </div>
                         <div class="form-group">
                             <label>景点简述：</label>
-                            <input type="text" class="form-control" id="pointdescription">
+                            <input type="text" class="form-control" id="pointdescription" maxlength="40">
                         </div>
 
                         <div class="form-group">
