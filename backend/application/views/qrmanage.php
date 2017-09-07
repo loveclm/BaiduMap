@@ -81,7 +81,7 @@
                             <td><?php echo $qr['time']; ?></td>
                             <td>
                                 <a href="#"
-                                   onclick="showQR('<?php echo base_url(); ?>', <?php echo $qr['id']; ?>);">查看</a>
+                                   onclick="showQR('<?php echo '?shopid=' . $qr['shopid'] .'&type=' . $qr['areatype'] . '&targetid=' . $qr['targetid']; ?>');">查看</a>
                             </td>
                         </tr>
                     <?php } ?>

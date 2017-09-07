@@ -89,7 +89,11 @@ class qrmanage extends BaseController
                     'shop' => $list->name,
                     'type' => $list->type == '1' ? '旅游线路' : '景区',
                     'time' => $list->created_time,
-                    'id' => $list->id);
+                    'id' => $list->id,
+                    'targetid' => $areaid,
+                    'areatype' => $list->type,
+                    'shopid' => $list->shopid
+                );
                 array_push($qrList, $info);
             }
         }
@@ -122,7 +126,11 @@ class qrmanage extends BaseController
                     'shop' => $list->name,
                     'type' => $list->type == '1' ? '旅游线路' : '景区',
                     'time' => $list->created_time,
-                    'id' => $list->id);
+                    'id' => $list->id,
+                    'targetid' => $areaid,
+                    'areatype' => $list->type,
+                    'shopid' => $list->shopid
+                );
                 array_push($qrList, $info);
             }
 
@@ -156,7 +164,7 @@ class qrmanage extends BaseController
                 $areaInfo = $this->area_model->getAreaById($areaid);
                 if (isset($areaInfo)) {
                     $courseName = $this->area_model->getCourseNameByAreaId($areaid);
-                    if ($searchType == 1 && $name!='all' && strstr($courseName, $name)==false) continue; // 0-shopname search, 1-coursename search
+                    if ($searchType == 1 && $name != 'all' && strstr($courseName, $name) == false) continue; // 0-shopname search, 1-coursename search
                     $areaInfo->name = $courseName;
                     if ($this->global['shop_manager_number'] != ''
                         && $this->global['shop_manager_number'] != $list->shopnumber
@@ -166,7 +174,11 @@ class qrmanage extends BaseController
                         'shop' => $list->name,
                         'type' => $list->type == '1' ? '旅游线路' : '景区',
                         'time' => $list->created_time,
-                        'id' => $list->id);
+                        'id' => $list->id,
+                        'targetid' => $areaid,
+                        'areatype' => $list->type,
+                        'shopid' => $list->shopid
+                    );
                     array_push($qrList, $info);
                 }
             }

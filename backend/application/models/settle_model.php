@@ -201,7 +201,7 @@ class settle_model extends CI_Model
                 $likeCriteria = "(phonenumber  LIKE '%" . $name . "%')";
                 break;
             case '1':
-                $likeCriteria = "(name  LIKE '%" . $name . "%')";
+                $likeCriteria = "(name LIKE '%" . $name . "%')";
                 break;
         }
         $this->db->where($likeCriteria);

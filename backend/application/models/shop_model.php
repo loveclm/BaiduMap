@@ -214,7 +214,7 @@ class shop_model extends CI_Model
      */
     function getQR($name = '', $type = 0, $searchType=0)
     {
-        $this->db->select('sh.name, sh.phonenumber as shopnumber, qr.type, qr.created_time, qr.data, qr.id, qr.targetid');
+        $this->db->select('sh.name, sh.id as shopid, sh.phonenumber as shopnumber, qr.type, qr.created_time, qr.data, qr.id, qr.targetid');
         $this->db->from('qrcode as qr');
         $this->db->join('shop as sh', 'sh.id = qr.shopid');
         if ($searchType==0 && $name != 'all') {

@@ -5,13 +5,7 @@
 
 // Code included inside $( document ).ready() will only run once the page Document Object Model (DOM) is ready for JavaScript code to execute
 $(document).ready(function () {
-    var count;
-    if ((document.getElementById("qrcount")) != null) {
-        count = $("#qrcount").html();
-        for (var i = 0; i < count; i++) {
-            $('#qr-view-' + i).qrcode({text: 'http://www.ayoubc.com/tour' + '?shopid=' + i},{width:128, height:128});
-        }
-    }
+
 });
 
 // Search course on Course List Page
@@ -91,7 +85,7 @@ function invalidAccount(account) {
 function processShop(url, id) {
 
     var name = $("#shopname").val();
-    var rate = parseFloat($("#shoprate").val()) / 100;
+    var rate = (100 - parseFloat($("#shoprate").val())) / 100;
     var account = $("#shopid").val();
     var password = $("#shoppassword").val();
     var type = $('#shoptype :selected').val();
@@ -100,16 +94,19 @@ function processShop(url, id) {
     var cityText = $('#cityName').html();
     var districtText = $('#districtName').html();
     if (districtText == '' || cityText == '' || provinceText == '') {
-        window.alert("Please select address correctly.");
+        window.alert("请选择地址.");
         return;
     }
     var address = provinceText + "," +
         cityText + "," + districtText;
-
     if (name.length > 10) {
         $('#custom-error-shopname').show();
         return;
-    }
+    } else $('#custom-error-shopname').hide();
+    if (account.length > 10) {
+        $('#custom-error-shopid').show();
+        return;
+    } else $('#custom-error-shopid').hide();
 
     if (invalidAccount(account)) {
         $('#custom-error-shopid').show();
@@ -262,9 +259,10 @@ function generateAuth(url, confirm) {
     }
 }
 
-function showQR(url, id) {
+function showQR(url_suffix) {
     $('#custom-generate-qr-view').show();
-    $('#qr-view').qrcode({text: 'http://www.ayoubc.com/tour' + '?shopid=' + id});
+    console.log('http://www.ayoubc.com/tour' + url_suffix);
+    $('#qr-view').qrcode({text: 'http://www.ayoubc.com/tour' + url_suffix});
 }
 
 function generateAuthFinal(url, confirm) {
@@ -273,12 +271,13 @@ function generateAuthFinal(url, confirm) {
     var target = $('#current-targetid').val();
     var type = $('#current-type').val();
     var shopid = $('#current-areaid').val();
+    var targetname;
 
     console.log('code ' + codeType + 'tar ' + target + ' type ' + type + ' shop ' + shopid + ' count ' + authCount);
 
     if (codeType == 'qr') {
 
-        var data = 'http://www.ayoubc.com/tour';
+        var data = 'http://www.ayoubc.com/tour?shopid=' + shopid + '&type=' + type + '&targetid=' + target;
         var authInfo = {
             shopid: shopid,
             type: type,
@@ -291,7 +290,7 @@ function generateAuthFinal(url, confirm) {
             $('#custom-generate-qr-view').show();
             $('#custom-generate-auth-view').hide();
 
-            $('#qr-view').qrcode({text: data + '?shopid=' + shopid});
+            $('#qr-view').qrcode({text: data});
 
             //location.href = url + 'shop';
         });

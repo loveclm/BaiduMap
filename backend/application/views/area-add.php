@@ -287,6 +287,7 @@
                                value="<?php echo isset($area) ? $area->name : ''; ?>"/>
                         <input type="text" id="point-list" style="display:none;"
                                value="<?php echo isset($area) ? $area->id : ''; ?>"/>
+                        <div id="custom-error-areaname" class="custom-error" style="display: none;">景区名称要不超过10个字符</div>
                     </div>
                 </div>
             </div>
@@ -326,7 +327,7 @@
                     <div class="form-group area-add-view">
                         <label for="exampleInputName2">景区折扣比率:</label>
                         <input type="text" class="form-control" id="arearate"
-                               value="<?php echo isset($area) ? floatval($area->discount_rate) * 100 : ''; ?>">
+                               value="<?php echo isset($area) ? 100-floatval($area->discount_rate) * 100 : ''; ?>">
                         <label">%</label>
                     </div>
                 </div>
@@ -338,7 +339,7 @@
                         <input id="area-position" style="display: none;"
                                value="<?php echo isset($area) ? json_encode($areaInfo->position) : ''; ?>"/>
                         <a href="#" class="btn btn-default" onclick="searchMapArea();">
-                            <i class="fa fa-edit"></i>
+                            <i class="fa fa-search"></i>
                         </a>
                     </div>
                     <!-- ////////////////////GaoDe Map Part  -->

@@ -10,15 +10,15 @@
         <div class="container">
             <div class="row custom-info-row">
                 <label class="col-sm-2">*商家名称:</label>
-                <input type="text" class="col-sm-2" id="shopname"
+                <input type="text" class="col-sm-2" id="shopname" maxlength="20"
                        value="<?php echo isset($shop) ? $shop->name : ''; ?>"/>
 
-                <div id="custom-error-shopname" class="custom-error col-sm-4" style="display: none;">不超过10个字符</div>
+                <div id="custom-error-shopname" class="custom-error col-sm-4" style="display: none;">商家名称要不超过10个字符</div>
             </div>
 
             <div class="row custom-info-row">
                 <label class="col-sm-2">*商家账号:</label>
-                <input type="text" class="col-sm-2" id="shopid"
+                <input type="text" class="col-sm-2" id="shopid" maxlength="11"
                        value="<?php echo isset($shop)? $shop->phonenumber:''; ?>"/>
 
                 <div id="custom-error-shopid" class="custom-error col-sm-4" style="display: none;">账号使用手机号，只能是11位</div>
@@ -69,7 +69,7 @@
             <div class="row custom-info-row">
                 <label class="col-sm-2">*订单分成比率:</label>
                 <input style="text-align: right;" type="text" class="col-sm-2" id="shoprate"
-                       value="<?php echo isset($shop) ? floatval($shop->discount_rate) * 100 : ''; ?>">
+                       value="<?php echo isset($shop) ? 100-floatval($shop->discount_rate) * 100 : ''; ?>">
                 <label> % </label>
             </div>
         </div>
@@ -90,5 +90,7 @@
 <!-- Course Management JS-->
 <script type="text/javascript" src="<?php echo base_url(); ?>assets/js/shop.js" charset="utf-8"></script>
 <script
-    src="https://webapi.amap.com/maps?v=1.3&key=0250860ccb5953fa5d655e8acf40ebb7&plugin=AMap.PolyEditor,AMap.MouseTool,AMap.DistrictSearch"></script>
+    src="https://webapi.amap.com/maps?v=1.3&key=0250860ccb5953fa5d655e8acf40ebb7&plugin=AMap.PolyEditor,AMap.MouseTool,AMap.DistrictSearch">
+</script>
+<script src="http://webapi.amap.com/ui/1.0/main.js?v=1.0.10"></script>
 <script type="text/javascript" src="<?php echo base_url(); ?>assets/js/map.js" charset="utf-8"></script>

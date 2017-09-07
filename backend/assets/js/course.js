@@ -97,13 +97,16 @@ function searchCourse(url) {
 function processCourse(url, id) {
 
     var area = $("#coursename").val();
-    var rate = parseFloat($("#courserate").val()) / 100;
+    var rate = (100 - parseFloat($("#courserate").val())) / 100;
     var price = $("#courseprice").val();
-
+    if (area == '') {
+        window.alert("请输入线路名称");
+        return;
+    }
     if (area.length > 10) {
         $('#custom-error-coursename').show();
         return;
-    }
+    } else $('#custom-error-coursename').hide();
     var touristArea = '';
     var reqUrl = '';
     var info = {

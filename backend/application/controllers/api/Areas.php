@@ -18,6 +18,7 @@ class Areas extends REST_Controller
         $this->load->model('order_model');
         $this->load->model('auth_model');
         $this->load->model('user_model');
+        $this->load->model('shop_model');
     }
 
     public function test_post()
@@ -123,9 +124,14 @@ class Areas extends REST_Controller
         $error = false;
         $files = array();
         $uploaddir = 'uploads/';
-        //var_dump($_FILES);
+        $tt = time();
+        $ext = explode(".", $_FILES[0]['name']);
+        $nn = rand(1000, 9999);
+        $filename = 'ayoubc' . $nn . $tt . '.' . $ext[1];
         foreach ($_FILES as $file) {
-            if (move_uploaded_file($file['tmp_name'], $uploaddir . basename($file['name']))) {
+//            if (move_uploaded_file($file['tmp_name'], $uploaddir . (basename($file['name'])))) {
+            if (move_uploaded_file($file['tmp_name'], $uploaddir . $filename)) {
+//                $files[] = $file['name'];
                 $files[] = $file['name'];
             } else {
                 $error = true;
@@ -133,7 +139,8 @@ class Areas extends REST_Controller
             break;
         }
         if (!$error) {
-            $this->response(array('status' => true, 'file' => $files[0]), 200);
+//            $this->response(array('status' => true, 'file' => $files[0]), 200);
+            $this->response(array('status' => true, 'file' => $filename, 'originfile' => $files[0]), 200);
         } else {
             $this->response(array('status' => false, 'error_message' => 'There was an error uploading your files!'), 404);
         }
@@ -415,6 +422,20 @@ class Areas extends REST_Controller
                 $this->user_model->addNewOrderUser($userInfo);
             }
             if ($type == '1' || $type == '2') { // 1-course, 2-area
+                $areaItem = $this->area_model->getAreaById($areaid);
+                $shopItem = $this->shop_model->getShopById($shopid);
+                if (count($areaItem) == 0) {
+                    $this->response(array('status' => false, 'result' => 'The area is not exist.'), 200);
+                    return;
+                }
+                if ($areaItem->type != $type) {
+                    $this->response(array('status' => false, 'result' => 'The course or area type is mismatch.'), 200);
+                    return;
+                }
+                if (count($shopItem) == 0) {
+                    $this->response(array('status' => false, 'result' => 'The shop is not exist.'), 200);
+                    return;
+                }
                 $authOrderItem = [
                     "value" => sprintf("%'.02d%'.08d", '12', $init['num']),
                     "code" => floor($cost * 100) / 100,
@@ -422,12 +443,18 @@ class Areas extends REST_Controller
                     "ordertype" => $type, // 1,2 - course or area
                     "status" => '2',// 2- ordered but unpaid
                     "areaid" => $areaid,
+                    "attractionid" => 0,
                     "authid" => $shopid,
                     "ordered_time" => $date->format('Y-m-d H:i:s'),
                 ];
-                $this->order_model->AddBuyOrder($authOrderItem);
+                $this->order_model->addBuyOrder($authOrderItem);
             } else if ($type == '3') {  // 3-attraction
                 $area = explode('_', $areaid);
+                $areaItem = $this->area_model->getAreaById($area[0]);
+                if (count($areaItem) == 0) {
+                    $this->response(array('status' => false, 'result' => '-1'), 200);
+                    return;
+                }
                 $authOrderItem = [
                     "value" => sprintf("%'.02d%'.08d", '12', $init['num']),
                     "code" => floor($cost * 100) / 100,
@@ -439,29 +466,31 @@ class Areas extends REST_Controller
                     "attractionid" => $areaid,
                     "ordered_time" => $date->format('Y-m-d H:i:s'),
                 ];
-                $this->order_model->AddBuyOrder($authOrderItem);
+                $this->order_model->addBuyOrder($authOrderItem);
             } else { // 4-authorization code
                 if ($shopid != '') {
                     $authOrderItem = [
-                        "value" => $areaid,
+                        "code" => $areaid,
                         "userphone" => $phone,
                         "ordertype" => $type, // 4-authorization
                         "status" => '1', // ordered and paid
                         "authid" => $shopid,
                         "paid_time" => $date->format('Y-m-d H:i:s')
                     ];
-                    if (!$this->order_model->AddAuthOrder($authOrderItem))
+                    if (!$this->order_model->addAuthOrder($authOrderItem))
                         $this->response(array('status' => false, 'result' => '-1'), 200);
                 }
             }
-            $this->response(array('status' => true, 'result' => $authOrderItem['value']), 200);
+            $this->response(array('status' => true, 'result' => $authOrderItem['code']), 200);
         }
     }
 
     public function setPayOrder_post()
     {
         $request = $this->post();
-        $value = $request['id'];
+        $value = $request['id'];// areaid  or courseid or attractionid
+        $value = explode("_", $value);
+        $value = $value[0];
         $phone = $request['phone'];
         $shopid = $request['shop'];
 

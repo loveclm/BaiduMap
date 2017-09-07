@@ -360,23 +360,25 @@ class order_model extends CI_Model
     {
         $this->db->select('*');
         $this->db->from('tbl_order');
-        $this->db->where('value', $authInfo['value']);
+        $this->db->where('code', $authInfo['code']);
         $this->db->where('ordertype', $authInfo['ordertype']);
         $query = $this->db->get();
         $result = $query->result();
         if (count($result) == 0) return FALSE;
+
         $OrderInfo = $result['0'];
         $OrderInfo->userphone = $authInfo['userphone'];
-        var_dump($OrderInfo);
         $shop = $this->getShopIdByAuthId($OrderInfo->authid);
+
         if (count($shop) == 0) $OrderInfo->authid = 0;
         else if ($shop->shopid != $authInfo['authid'])
             $OrderInfo->authid = 0;
+
         $OrderInfo->paid_time = $authInfo['paid_time'];
         $this->db->where('id', $OrderInfo->id);
         $this->db->update('tbl_order', $OrderInfo);
 
-        return $this->setStatusByOrderId($OrderInfo->id);;
+        return $this->setStatusByOrderId($OrderInfo->id);
     }
 
     function getShopIdByAuthId($authid)
@@ -398,7 +400,7 @@ class order_model extends CI_Model
     {
         $this->db->select('*');
         $this->db->from('tbl_order');
-        $this->db->where('value', $value);
+        $this->db->where('areaid', $value);
         $this->db->where('userphone', $phone);
         $this->db->where('authid', $shopid);
         $query = $this->db->get();
@@ -407,7 +409,7 @@ class order_model extends CI_Model
         $OrderInfo = $result['0'];
         if ($this->setStatusByOrderId($OrderInfo->id) == 3) return FALSE;
         $date = new DateTime();
-        $OrderInfo->paid_time = date_format($date, "Y-M-d H:i:s");
+        $OrderInfo->paid_time = date_format($date, "Y-m-d H:i:s");
         $this->db->where('id', $OrderInfo->id);
         $this->db->update('tbl_order', $OrderInfo);
         return $this->setStatusByOrderId($OrderInfo->id);

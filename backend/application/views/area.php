@@ -155,4 +155,5 @@
 <script type="text/javascript" src="<?php echo base_url(); ?>assets/js/area.js" charset="utf-8"></script>
 <script
     src="http://webapi.amap.com/maps?v=1.3&key=0250860ccb5953fa5d655e8acf40ebb7&plugin=AMap.PolyEditor,AMap.MouseTool,AMap.DistrictSearch"></script>
+<script src="http://webapi.amap.com/ui/1.0/main.js?v=1.0.10"></script>
 <script type="text/javascript" src="<?php echo base_url(); ?>assets/js/map.js" charset="utf-8"></script>

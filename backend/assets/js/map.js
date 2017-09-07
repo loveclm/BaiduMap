@@ -267,7 +267,7 @@ $(document).ready(function () {
         map = new AMap.Map('custom-map-container', {
             resizeEnable: true,
             center: currentLocation,
-            zoom: 17,
+            zoom: 15,
             scrollWheel: true
             //layers: [
             //    new AMap.TileLayer(),
@@ -284,13 +284,17 @@ $(document).ready(function () {
             zooms: [2, 18],
             map: map
         });
+        imageLayer.setzIndex(100);
+        imageLayer.setMap(map);
         mapMarker = new AMap.Marker({
             map: map,
+            //icon: base_url + 'uploads/ayoubc15047194103348.jpg',
             icon: base_url + 'assets/images/control.png',
             offset: new AMap.Pixel(-20, -20),
             position: currentLocation,
             draggable: true
         });
+        mapMarker.setzIndex(400);
         dragging = false;
         mapMarker.on('dragstart', function (e) {
             dragging = true;
@@ -327,6 +331,7 @@ $(document).ready(function () {
             position: cornerLocation,
             draggable: true
         });
+        mapMarker1.setzIndex(400);
         dragging1 = false;
         mapMarker1.on('dragstart', function (e) {
             dragging1 = true;
@@ -356,7 +361,16 @@ $(document).ready(function () {
         currentLocation = [(leftBottom[0] + rightTop[0]) / 2, (leftBottom[1] + rightTop[1]) / 2];
         cornerLocation = [rightTop[0], leftBottom[1]];
         initMap(currentLocation);
-
+        map = new AMap.Map('custom-map-container', {
+            resizeEnable: true,
+            center: currentLocation,
+            zoom: 15,
+            scrollWheel: true
+            //layers: [
+            //    new AMap.TileLayer(),
+            //    imageLayer
+            //]
+        });
         imageLayer = new AMap.ImageLayer({
             url: base_url + 'assets/images/bound.png',
             bounds: new AMap.Bounds(
@@ -366,6 +380,8 @@ $(document).ready(function () {
             zooms: [1, 18],
             map: map
         });
+        imageLayer.setzIndex(100);
+        imageLayer.setMap(map);
         mapMarker = new AMap.Marker({
             map: map,
             icon: base_url + 'assets/images/control.png',
@@ -373,6 +389,7 @@ $(document).ready(function () {
             position: currentLocation,
             draggable: true
         });
+        mapMarker.setzIndex(400);
         dragging = false;
         mapMarker.on('dragstart', function (e) {
             dragging = true;
@@ -408,6 +425,7 @@ $(document).ready(function () {
             position: cornerLocation,
             draggable: true
         });
+        mapMarker1.setzIndex(400);
         dragging1 = false;
         mapMarker1.on('dragstart', function (e) {
             dragging1 = true;
@@ -487,7 +505,6 @@ $(document).ready(function () {
         $.each(files, function (key, value) {
             data.append(key, value);
         });
-
         $.ajax({
             url: base_url + 'api/Areas/upload',
             type: 'POST',
@@ -520,6 +537,7 @@ $(document).ready(function () {
                             zooms: [5, 18],
                             draggable: true
                         });
+                        imageLayer.setzIndex(100);
                         imageLayer.setMap(map);
                     }
                 }
@@ -791,6 +809,15 @@ function addPoint(param) {
     var pointAudio = $('#pointaudio').val();
 
     var pointFree = ($('#pointfree').is(":checked") == true) ? '1' : '0';
+    if (pointName.length > 10) {
+        window.alert("景点名称要不超过10个字符");
+        return;
+    }
+    if (pointDescription.length > 20) {
+        window.alert("景点简述要不超过20个字符");
+        return;
+    }
+
 
     $('.point-add-view').hide();
     $('.point-list-view').show();
@@ -902,23 +929,28 @@ function deletePoint(e) {
 
 function addTouristArea(url, isEdit) {
     var area = $("#areaname").val();
-    var rate = parseFloat($("#arearate").val()) / 100;
+    var rate = (100 - parseFloat($("#arearate").val())) / 100;
     var overlay = $('#area-overlay').val();
     var provinceText = $('#provinceName').html();
     var cityText = $('#cityName').html();
     var districtText = $('#districtName').html();
     var pointText = $('#city_Name').val();
     if (districtText == '' || cityText == '' || provinceText == '') {
-        window.alert("Please select address correctly.");
+        window.alert("请选择地址");
         return;
     }
     var address = provinceText + "," +
         cityText + "," + districtText + "," + pointText;
 
     if (area == '') {
-        window.alert("Please enter area name.");
+        window.alert("请请输入名称");
         return;
     }
+
+    if (area.length > 10) {
+        $("#custom-error-areaname").show();
+        return;
+    } else $("#custom-error-areaname").hide();
 
     var info = {
         overay: overlay,
@@ -948,7 +980,7 @@ function addTouristArea(url, isEdit) {
     var area_id = $('#point-list').val();
     var url_suffix = (area_id == undefined) ? "" : ("/" + area_id);
     $.post(url + "api/Areas/save" + url_suffix, touristArea, function (result) {
-        window.alert("Area data saved succefully.");
+        window.alert("景区保存成功。");
         location.href = url + 'area';
     });
 }

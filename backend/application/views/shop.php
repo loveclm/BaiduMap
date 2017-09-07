@@ -80,9 +80,14 @@
                         <a class="btn btn-primary" href="#" onclick="searchShop('<?php echo base_url(); ?>');">
                             <span>查询</span>
                         </a>
-                        <a class="btn btn-primary" href="<?php echo base_url(); ?>addshop">
-                            <span>新增</span>
-                        </a>
+                        <?php
+                        if ($shop_manager_number == '') {
+                            ?>
+                            <a class="btn btn-primary" href="<?php echo base_url(); ?>addshop">
+                                <span>新增</span>
+                            </a>
+                            <?php
+                        } ?>
 
                     </div>
                 </div>
@@ -120,28 +125,38 @@
                             <td><?php echo $shop->address_1; ?></td>
                             <td><?php echo $shop->status == 1 ? '已禁用' : '未禁用'; ?></td>
                             <td>
-                                <a href="<?php echo base_url(); ?>showshop/<?php echo $shop->id; ?>">查看 &nbsp;&nbsp;</a>
-                                <a href="<?php echo base_url(); ?>editshop/<?php echo $shop->id; ?>">编辑 &nbsp;&nbsp;</a>
                                 <?php
-                                if ($shop->status == 0) {
+                                if ($shop_manager_number == '') {
                                     ?>
-                                    <a href="#"
-                                       onclick="deleteShopConfirm(<?php echo $shop->id; ?>);">删除 &nbsp;&nbsp;</a>
+                                    <a href="<?php echo base_url(); ?>showshop/<?php echo $shop->id; ?>">查看
+                                        &nbsp;&nbsp;</a>
+
+                                    <a href="<?php echo base_url(); ?>editshop/<?php echo $shop->id; ?>">编辑
+                                        &nbsp;&nbsp;</a>
                                     <?php
-                                }
-                                if ($shop->status == 0) {
+                                    if ($shop->status == 0) {
+                                        ?>
+                                        <a href="#"
+                                           onclick="deleteShopConfirm(<?php echo $shop->id; ?>);">删除 &nbsp;&nbsp;</a>
+                                        <?php
+                                    }
+                                    if ($shop->status == 0) {
+                                        ?>
+                                        <a href="#"
+                                           onclick="deployShopConfirm(<?php echo $shop->id; ?>);">禁用 &nbsp;&nbsp;</a>
+                                        <?php
+                                    } else {
+                                        ?>
+                                        <a href="#" onclick="undeployShopConfirm(<?php echo $shop->id; ?>);">取消禁用 &nbsp;&nbsp;</a>
+                                        <?php
+                                    }
                                     ?>
-                                    <a href="#"
-                                       onclick="deployShopConfirm(<?php echo $shop->id; ?>);">禁用 &nbsp;&nbsp;</a>
+                                    <a href="#" onclick="showGenerateQR(<?php echo $shop->id; ?>);">生成二维码
+                                        &nbsp;&nbsp;</a>
+                                    <a href="#" onclick="showGenerateAuth(<?php echo $shop->id; ?>);">发放授权码
+                                        &nbsp;&nbsp;</a>
                                     <?php
-                                } else {
-                                    ?>
-                                    <a href="#" onclick="undeployShopConfirm(<?php echo $shop->id; ?>);">取消禁用 &nbsp;&nbsp;</a>
-                                    <?php
-                                }
-                                ?>
-                                <a href="#" onclick="showGenerateQR(<?php echo $shop->id; ?>);">生成二维码 &nbsp;&nbsp;</a>
-                                <a href="#" onclick="showGenerateAuth(<?php echo $shop->id; ?>);">发放授权码 &nbsp;&nbsp;</a>
+                                } ?>
                             </td>
                         </tr>
                     <?php } ?>
@@ -154,8 +169,10 @@
                         </p>
 
                         <div class="form-group">
-                            <button class="btn btn-default" onclick="deleteShop('<?php echo base_url(); ?>', 0);">取消</button>
-                            <button class="btn btn-primary" onclick="deleteShop('<?php echo base_url(); ?>', 1);">确定</button>
+                            <button class="btn btn-default" onclick="deleteShop('<?php echo base_url(); ?>', 0);">取消
+                            </button>
+                            <button class="btn btn-primary" onclick="deleteShop('<?php echo base_url(); ?>', 1);">确定
+                            </button>
                         </div>
 
                     </div>
@@ -165,8 +182,10 @@
                         </p>
 
                         <div class="form-group">
-                            <button class="btn btn-default" onclick="deployShop('<?php echo base_url(); ?>', 0);">取消</button>
-                            <button class="btn btn-primary" onclick="deployShop('<?php echo base_url(); ?>', 1);">确定</button>
+                            <button class="btn btn-default" onclick="deployShop('<?php echo base_url(); ?>', 0);">取消
+                            </button>
+                            <button class="btn btn-primary" onclick="deployShop('<?php echo base_url(); ?>', 1);">确定
+                            </button>
                             <input id="current-areaid" style="display: none;"/>
                             <input id="current-areastatus" style="display: none;"/>
                             <input id="current-type" style="display: none;"/>
@@ -217,7 +236,8 @@
                         </div>
                         <div class="form-group">
                             <button class="btn btn-default" onclick="cancel('<?php echo base_url(); ?>');">取消</button>
-                            <button class="btn btn-primary" onclick="generateAuth('<?php echo base_url(); ?>');">确定</button>
+                            <button class="btn btn-primary" onclick="generateAuth('<?php echo base_url(); ?>');">确定
+                            </button>
                         </div>
                     </div>
 
@@ -229,7 +249,9 @@
 
                         <div class="form-group">
                             <button class="btn btn-default" onclick="cancel('<?php echo base_url(); ?>');">取消</button>
-                            <button class="btn btn-primary" onclick="generateAuthFinal('<?php echo base_url(); ?>');">确定</button>
+                            <button class="btn btn-primary" onclick="generateAuthFinal('<?php echo base_url(); ?>');">
+                                确定
+                            </button>
                         </div>
                     </div>
                     <div id="custom-generate-qr-view" style="min-width:350px; display:none;">
@@ -252,4 +274,5 @@
 <script type="text/javascript" src="<?php echo base_url(); ?>assets/js/qrcode.js" charset="utf-8"></script>
 <script
     src="http://webapi.amap.com/maps?v=1.3&key=0250860ccb5953fa5d655e8acf40ebb7&plugin=AMap.PolyEditor,AMap.MouseTool,AMap.DistrictSearch"></script>
+<script src="http://webapi.amap.com/ui/1.0/main.js?v=1.0.10"></script>
 <script type="text/javascript" src="<?php echo base_url(); ?>assets/js/map.js" charset="utf-8"></script>
