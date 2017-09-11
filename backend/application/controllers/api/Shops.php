@@ -43,10 +43,10 @@ class Shops extends REST_Controller
 
         if (!$id) {
             $new_id = $this->shop_model->add($this->post());
-            $this->response(array('status' => true, 'id' => $new_id, 'message' => sprintf('Area #%d has been created.', $new_id)), 200);
+            $this->response(array('status' => true, 'id' => $new_id, 'message' => sprintf('新增景区成功.', $new_id)), 200);
         } else {
             $this->shop_model->update($this->post(), $id);
-            $this->response(array('status' => true, 'message' => sprintf('Area #%d has been updated.', $id)), 200);
+            $this->response(array('status' => true, 'message' => sprintf('修改景区成功.', $id)), 200);
         }
     }
 
@@ -66,15 +66,15 @@ class Shops extends REST_Controller
         if (!$id) {
             $new_id = $this->user_model->addNewUser($newAccount);
             if($new_id == 0) {
-                $this->response(array('status' => false, 'id' => 0, 'message' => sprintf('This account is exists.', $new_id)), 200);
+                $this->response(array('status' => false, 'id' => 0, 'message' => sprintf('帐号已存在.', $new_id)), 200);
             }else {
                 $new_id = $this->shop_model->add($newShop);
-                $this->response(array('status' => true, 'id' => $new_id, 'message' => sprintf('Shop #%d has been created.', $new_id)), 200);
+                $this->response(array('status' => true, 'id' => $new_id, 'message' => sprintf('新增商家成功.', $new_id)), 200);
             }
         } else {
             $new_id = $this->user_model->updateUser($newAccount, $newAccount['email']);
             $this->shop_model->update($this->post(), $id);
-            $this->response(array('status' => true, 'message' => sprintf('Shop #%d has been updated.', $id)), 200);
+            $this->response(array('status' => true, 'message' => sprintf('修改商家成功.', $id)), 200);
         }
     }
 
@@ -92,9 +92,9 @@ class Shops extends REST_Controller
             "updatedDtm"=>date_format($date_now,"Y-m-d H:i:s"), // 1- updated by admin
         ];
         if ($this->shop_model->delete($id) && $this->user_model->updateUser($newAccount, $newAccount['email'])) {
-            $this->response(array('status' => true, 'message' => sprintf('Area #%d has been deleted.', $id)), 200);
+            $this->response(array('status' => true, 'message' => sprintf('景区删除成功.', $id)), 200);
         } else {
-            $this->response(array('status' => false, 'error_message' => 'This Area does not exist!'), 200);
+            $this->response(array('status' => false, 'error_message' => '景区没有了!'), 200);
         }
     }
 
@@ -119,18 +119,18 @@ class Shops extends REST_Controller
             $date = new DateTime();
             $authOrderItem = array(
                 "authid" => sprintf("%d", $authid),
-                "value" => sprintf("%'.02d%'.08d", '12', $init['num'] + $i),
+                "value" => sprintf("%'.011d", time()),
                 "userphone" => '0',
                 "areaid" => $authInfo['targetid'],
                 "status" => '0',
-                "code" => sprintf("%'.03d%'.03d%'.05d", $authInfo['shopid'], $authInfo['targetid'], $init['code'] + $i),
+                "code" => sprintf("%'.03d%'.03d%'.06d", $authInfo['shopid'], $authInfo['targetid'], $init['code'] + $i),
                 "ordered_time" => $date->format('Y-m-d H:i:s'),
                 "ordertype" => '4'
             );
 
             $this->shop_model->addAuthOrder($authOrderItem);
         }
-        $this->response(array('status' => true, 'message' => sprintf('Authcode #%d has been created.', $authInfo['codecount'])), 200);
+        $this->response(array('status' => true, 'message' => sprintf('新增授权码成功.', $authInfo['codecount'])), 200);
     }
 
     public function generateQR_post($id = NULL)
@@ -148,7 +148,7 @@ class Shops extends REST_Controller
         );
 
         $this->shop_model->addQR($authItem);
-        $this->response(array('status' => true, 'message' => sprintf('QRcode has been created.')), 200);
+        $this->response(array('status' => true, 'message' => sprintf('新增二维码成功.')), 200);
     }
 
 ////////////////////// External Rest APIs

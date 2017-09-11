@@ -5,7 +5,6 @@
 
 // Code included inside $( document ).ready() will only run once the page Document Object Model (DOM) is ready for JavaScript code to execute
 $(document).ready(function () {
-
 });
 
 function deleteAreaConfirm_jingqu(id) {
@@ -98,7 +97,7 @@ function test_api111() {
     $.ajax({
         type: 'POST',
         //url: 'http://www.ayoubc.com/backend/api/Areas/getMyAreaInfos',
-        url: 'http://192.168.2.18/backend/api/Areas/setAreaBuyOrder',
+        url: 'http://192.168.2.18/backend/api/Areas/setPayOrder',
         dataType: 'json',
         username: 'admin',
         password: '1234',
@@ -122,17 +121,19 @@ function test_api() {
     var posi = [116.404845, 39.898345];
     //var id = '00700100002';
 
-    var phone = '13054061981';
+    var phone = '12345678901';
     var cost = '00505000007';
-    var cost = '6';
+    var cost = '0.7';
     var type = '2';
-    var id = '1';
-    var shopid = '8';
+    var id = '01505093495';
+    var shopid = '7';
     $.ajax({
         type: 'POST',
-//        url: 'http://www.ayoubc.com/backend/api/Areas/setAreaBuyOrder',
+        //url: 'http://www.ayoubc.com/backend/api/Areas/getAllCourseInfos',
+//        url: 'http://www.ayoubc.com/backend/api/Areas/getMyOrderInfos',
+//        url: 'http://192.168.2.18/backend/api/Areas/setPayOrder',
 //        url: 'http://192.168.2.18/backend/api/Areas/setAreaBuyOrder',
-        url: 'http://192.168.2.18/backend/api/Areas/setPayOrder',
+        url: 'http://www.ayoubc.com/backend/api/Areas/getAllCourseInfos',
         dataType: 'json',
         username: 'admin',
         password: '1234',

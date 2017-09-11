@@ -122,6 +122,9 @@ if(!empty($userInfo))
                         <div class="alert alert-success alert-dismissable">
                             <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
                             <?php echo $this->session->flashdata('success'); ?>
+                            <input id="success_alert"
+                                   value="<?php echo $this->session->flashdata('success'); ?>"
+                                style="display: block;">
                         </div>
                     <?php } ?>
 

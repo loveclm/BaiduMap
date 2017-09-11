@@ -327,7 +327,7 @@
                     <div class="form-group area-add-view">
                         <label for="exampleInputName2">景区折扣比率:</label>
                         <input type="text" class="form-control" id="arearate"
-                               value="<?php echo isset($area) ? 100-floatval($area->discount_rate) * 100 : ''; ?>">
+                               value="<?php echo isset($area) ? (floatval($area->discount_rate) * 100) : ''; ?>">
                         <label">%</label>
                     </div>
                 </div>
@@ -359,6 +359,7 @@
                             <input id="area-overlay" value="<?php echo isset($area) ? ($areaInfo->overay) : ''; ?>"
                                    style="display: none;"/>
                         </div>
+                        <div id="area-image-message" style="text-align: right; margin:20px;"></div>
                         <div class="form-group">
                             <div id="pointList">
 
@@ -385,10 +386,11 @@
                             <a class="btn btn-primary" onclick="uploadPointImage();">
                                 <span>上传图片</span>
                             </a>
+                            <span id="point-image-message" ></span>
                         </div>
 
-                        <div class="form-group">
-                            <img id="point-item-image" style="height: 150px;width: 100%;" src=""/>
+                        <div class="form-group" style="height: 150px;width: 100%;">
+                            <img id="point-item-image" style="height: 150px;width: 100%; display:none;" src=""/>
                         </div>
 
                         <div class="form-group">
@@ -430,7 +432,7 @@
             </div>
 
         </div>
-
+        <input id="page_loaded_status" value="0" style="display: none;"/>
     </section>
 </div>
 

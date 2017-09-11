@@ -173,6 +173,7 @@ class area extends BaseController
         {
             $this->global['pageTitle'] = '新增景区';
             $this->global['isEdit']='0';
+            $this->global['page_type_name']='area_add_interface';
             $this->loadViews("area-add", $this->global, NULL, NULL);
         }
     }
@@ -191,6 +192,7 @@ class area extends BaseController
 
             $this->global['pageTitle'] = '编辑景区';
             $this->global['area'] = $this->area_model->getAreaById($id);
+            $this->global['page_type_name']='area_add_interface';
             $this->global['isEdit']='1';
 
             $this->loadViews("area-add", $this->global, NULL, NULL);

@@ -40,7 +40,7 @@ function initMap(center) {
 
     map = new AMap.Map('custom-map-container', {
         resizeEnable: true,
-        zoom: 16,
+        zoom: 14,
         center: center//地图中心点
     });
 
@@ -93,20 +93,22 @@ function getData(data, level) {
             });
             polygons.push(polygon);
             map.setFitView();//地图自适应
-            var pos = map.getCenter();
-            currentLocation = [pos['lng'], pos['lat']];
-            console.log(currentLocation);
-            var position = currentLocation;
+            setTimeout(function () {
+                var pos = map.getCenter();
+                currentLocation = [pos['lng'], pos['lat']];
+                console.log(currentLocation);
+                var position = currentLocation;
 
-            leftBottom = [position[0] - .001, position[1] - .001];
-            rightTop = [position[0] + .001, position[1] + .001];
+                leftBottom = [position[0] - .01, position[1] - .01];
+                rightTop = [position[0] + .01, position[1] + .01];
 
-            imageLayer.setBounds(new AMap.Bounds(leftBottom, rightTop));
-            cornerLocation = [rightTop[0], leftBottom[1]];
-            mapMarker.setPosition(currentLocation);
-            mapMarker1.setPosition(cornerLocation);
-            var arr = [leftBottom, rightTop];
-            $('#area-position').val(JSON.stringify(arr));
+                imageLayer.setBounds(new AMap.Bounds(leftBottom, rightTop));
+                cornerLocation = [rightTop[0], leftBottom[1]];
+                mapMarker.setPosition(currentLocation);
+                mapMarker1.setPosition(cornerLocation);
+                var arr = [leftBottom, rightTop];
+                $('#area-position').val(JSON.stringify(arr));
+            }, 1000);
         }
 
     }
@@ -114,8 +116,8 @@ function getData(data, level) {
 
     //清空下一级别的下拉列表
     if (level === 'province') {
-        citySelect.innerHTML = $("#cityName").html();
-        districtSelect.innerHTML = $("#districtName").html();
+        citySelect.innerHTML = '';
+        districtSelect.innerHTML = '';
         areaSelect.innerHTML = '';
     } else if (level === 'city') {
         districtSelect.innerHTML = '';
@@ -126,20 +128,24 @@ function getData(data, level) {
 
     var subList = data.districtList;
     var contentSub, curlevel, curList;
-    if ($("#provinceName").html() != '') {
-        contentSub = new Option($("#provinceName").html());
-        curList = document.querySelector('#province');
-        curList.add(contentSub);
-    }
-    if ($("#cityName").html() != '') {
-        contentSub = new Option($("#cityName").html());
-        curList = document.querySelector('#city');
-        curList.add(contentSub);
-    }
-    if ($("#districtName").html() != '') {
-        contentSub = new Option($("#districtName").html());
-        curList = document.querySelector('#district');
-        curList.add(contentSub);
+
+    if($("#page_loaded_status").val()=='0')
+    {
+        if ($("#provinceName").html() != '') {
+            contentSub = new Option($("#provinceName").html());
+            curList = document.querySelector('#province');
+            curList.add(contentSub);
+        }
+        if ($("#cityName").html() != '') {
+            contentSub = new Option($("#cityName").html());
+            curList = document.querySelector('#city');
+            curList.add(contentSub);
+        }
+        if ($("#districtName").html() != '') {
+            contentSub = new Option($("#districtName").html());
+            curList = document.querySelector('#district');
+            curList.add(contentSub);
+        }
     }
 
     if (subList) {
@@ -217,8 +223,8 @@ AMapUI.loadUI(['misc/PoiPicker'], function (PoiPicker) {
             map.setCenter(currentLocation);
             var position = currentLocation;
 
-            leftBottom = [position[0] - .001, position[1] - .001];
-            rightTop = [position[0] + .001, position[1] + .001];
+            leftBottom = [position[0] - .01, position[1] - .01];
+            rightTop = [position[0] + .01, position[1] + .01];
 
             imageLayer.setBounds(new AMap.Bounds(leftBottom, rightTop));
             cornerLocation = [rightTop[0], leftBottom[1]];
@@ -267,7 +273,7 @@ $(document).ready(function () {
         map = new AMap.Map('custom-map-container', {
             resizeEnable: true,
             center: currentLocation,
-            zoom: 15,
+            zoom: 12,
             scrollWheel: true
             //layers: [
             //    new AMap.TileLayer(),
@@ -281,7 +287,7 @@ $(document).ready(function () {
                 leftBottom,     //左下角
                 rightTop        //右上角
             ),
-            zooms: [2, 18],
+            zooms: [2, 20],
             map: map
         });
         imageLayer.setzIndex(100);
@@ -315,6 +321,22 @@ $(document).ready(function () {
                 leftBottom[1] += dy;
                 rightTop[0] += dx;
                 rightTop[1] += dy;
+
+                for(var i=0; i<markList.length; i++){
+
+                    var pos1 =JSON.parse($('#pointposition-' + markList[i]['G']['id']).val());
+
+                    markList[i]['G']['position']['lng'] =  pos1[0] + dx;
+                    markList[i]['G']['position']['lat'] =  pos1[1] +  dy;
+
+                    markposition=[markList[i]['G']['position']['lng'],markList[i]['G']['position']['lat']];
+
+                    $('#pointposition-' + markList[i]['G']['id']).val(JSON.stringify(markposition));
+
+                    markList[i].setPosition(markposition);
+
+                }
+
 
                 imageLayer.setBounds(new AMap.Bounds(leftBottom, rightTop));
                 cornerLocation = [rightTop[0], leftBottom[1]];
@@ -364,7 +386,7 @@ $(document).ready(function () {
         map = new AMap.Map('custom-map-container', {
             resizeEnable: true,
             center: currentLocation,
-            zoom: 15,
+            zoom: 14,
             scrollWheel: true
             //layers: [
             //    new AMap.TileLayer(),
@@ -377,7 +399,7 @@ $(document).ready(function () {
                 leftBottom,     //左下角
                 rightTop        //右上角
             ),
-            zooms: [1, 18],
+            zooms: [1, 20],
             map: map
         });
         imageLayer.setzIndex(100);
@@ -505,6 +527,9 @@ $(document).ready(function () {
         $.each(files, function (key, value) {
             data.append(key, value);
         });
+
+        $("#area-image-message").html('图片上传中...');
+
         $.ajax({
             url: base_url + 'api/Areas/upload',
             type: 'POST',
@@ -521,7 +546,7 @@ $(document).ready(function () {
                             map = new AMap.Map('custom-map-container', {
                                 resizeEnable: true,
                                 center: currentLocation,
-                                zoom: 16,
+                                zoom: 14,
                             });
                         }
 
@@ -540,6 +565,7 @@ $(document).ready(function () {
                         imageLayer.setzIndex(100);
                         imageLayer.setMap(map);
                     }
+                    $("#area-image-message").html('');
                 }
                 else {
                     // Handle errors here
@@ -575,6 +601,9 @@ $(document).ready(function () {
             data.append(key, value);
         });
 
+        $("#point-image-message").html('图片上传中...');
+        $("#point-image-message").show();
+
         $.ajax({
             url: base_url + 'api/Areas/upload',
             type: 'POST',
@@ -588,7 +617,10 @@ $(document).ready(function () {
                     if (data['status'] == true) {
                         var url = base_url + 'uploads/' + data['file'];
                         $("#point-item-image").attr("src", url);
+                        $("#point-item-image").show();
                         $("#pointimage").val(data['file']);
+
+                        $("#point-image-message").html('');
                     }
                 }
                 else {
@@ -620,6 +652,7 @@ $(document).ready(function () {
             return;
         }
 
+        $("#pointaudio_view").show();
         $("#pointaudio_view").html('录音上传中...');
 
         var data = new FormData();
@@ -636,6 +669,7 @@ $(document).ready(function () {
             processData: false, // Don't process the files
             contentType: false, // Set content type to false as jQuery will tell the server its a query string request
             success: function (data, textStatus, jqXHR) {
+                console.log(data);
                 if (typeof data.error === 'undefined') {
                     if (data['status'] == true) {
                         $("#pointaudio").val(data['file']);
@@ -673,12 +707,14 @@ $(document).ready(function () {
             return;
         }
 
+        $("#area-audio-file").show();
         $("#area-audio-file").html('录音上传中...');
 
         var data = new FormData();
         $.each(files, function (key, value) {
             data.append(key, value);
         });
+        console.log(data);
 
         $.ajax({
             url: base_url + 'api/Areas/upload',
@@ -708,7 +744,27 @@ $(document).ready(function () {
                 // STOP LOADING SPINNER
             }
         });
+    }
 
+    $status = $("#page_type_name").val();
+    if ($("#page_type_name").val() == 'area_add_interface') {
+        $("#page_loaded_status").val("1");
+    }
+
+    if ($("#provinceName").html() != '') {
+        contentSub = new Option($("#provinceName").html());
+        curList = document.querySelector('#province');
+        curList.add(contentSub);
+    }
+    if ($("#cityName").html() != '') {
+        contentSub = new Option($("#cityName").html());
+        curList = document.querySelector('#city');
+        curList.add(contentSub);
+    }
+    if ($("#districtName").html() != '') {
+        contentSub = new Option($("#districtName").html());
+        curList = document.querySelector('#district');
+        curList.add(contentSub);
     }
 });
 var isNewPoint = 0;
@@ -719,6 +775,7 @@ function showAddPoint() {
     $('.point-add-view').show();
     $('.point-list-view').hide();
 
+
     $('#pointname').val('');
     $('#pointdescription').val('');
     $('#pointprice').val('');
@@ -726,6 +783,9 @@ function showAddPoint() {
     $("#point-item-image").attr("src", '');
     $("#pointimage").val('');
     $("#pointfree").attr("checked", false);
+
+    $("#point-item-image").hide();
+    $("#pointaudio_view").html('');
 
 
 }
@@ -737,9 +797,18 @@ function showPointMarker() {
     marker = new AMap.Marker({ //添加自定义点标记
         map: map,
         position: map.getCenter(), //基点位置
-        offset: new AMap.Pixel(-17, -42), //相对于基点的偏移位置
+        offset: new AMap.Pixel(-10, -20), //相对于基点的偏移位置
         draggable: true,
         id: markerId
+    });
+    marker.on('dragend', function (e) {
+        var target = e['target']['G'];
+        var position = [e['lnglat']['lng'], e['lnglat']['lat']];
+        //markList[target['id']].setPosition(position);
+        //markList[target['id']]['G']['position']['lng']=position[0];
+        //markList[target['id']]['G']['position']['lat']=position[1];
+        $('#pointposition-' + target['id']).val(JSON.stringify(position));
+        console.log(e);
     });
 }
 // Add attraction to Tourist Area
@@ -766,7 +835,7 @@ function addPointFromArea(url) {
             var marker = new AMap.Marker({ //添加自定义点标记
                 map: map,
                 position: pointPosition, //基点位置
-                offset: new AMap.Pixel(-17, -42), //相对于基点的偏移位置
+                offset: new AMap.Pixel(-10, -20), //相对于基点的偏移位置
                 draggable: true,
                 id: markerId
             });
@@ -775,7 +844,6 @@ function addPointFromArea(url) {
                 var target = e['target']['G'];
                 var position = [e['lnglat']['lng'], e['lnglat']['lat']];
                 $('#pointposition-' + target['id']).val(JSON.stringify(position));
-                console.log(e);
             });
 
             marker.on('click', function (e) {
@@ -818,7 +886,6 @@ function addPoint(param) {
         return;
     }
 
-
     $('.point-add-view').hide();
     $('.point-list-view').show();
     console.log(pointImage + ',' + pointAudio);
@@ -833,6 +900,9 @@ function addPoint(param) {
             marker.on('dragend', function (e) {
                 var target = e['target']['G'];
                 var position = [e['lnglat']['lng'], e['lnglat']['lat']];
+                //markList[target['id']].setPosition(position);
+                //markList[target['id']]['G']['position']['lng']=position[0];
+                //markList[target['id']]['G']['position']['lat']=position[1];
                 $('#pointposition-' + target['id']).val(JSON.stringify(position));
                 console.log(e);
             });
@@ -896,8 +966,6 @@ function showEditPoint(targetId) {
     $('#pointprice').val(pointPrice);
     $('#point-view-index').val(targetId);
 
-    $("#point-item-image").attr("src", base_url + 'uploads/' + pointImage);
-    $("#pointaudio_view").html(pointAudio);
     $("#pointimage").val(pointImage);
     $("#pointaudio").val(pointAudio);
     if (pointFree == '1') { // 1-trial, 0-need pay
@@ -910,6 +978,11 @@ function showEditPoint(targetId) {
 
     $('.point-add-view').show();
     $('.point-list-view').hide();
+
+    $("#point-item-image").attr("src", base_url + 'uploads/' + pointImage);
+    $("#point-item-image").show();
+    $("#pointaudio_view").html(pointAudio);
+    $("#pointaudio_view").show();
 }
 
 // delete Attraction
@@ -929,7 +1002,7 @@ function deletePoint(e) {
 
 function addTouristArea(url, isEdit) {
     var area = $("#areaname").val();
-    var rate = (100 - parseFloat($("#arearate").val())) / 100;
+    var rate = (parseFloat($("#arearate").val())) / 100;
     var overlay = $('#area-overlay').val();
     var provinceText = $('#provinceName').html();
     var cityText = $('#cityName').html();
@@ -954,15 +1027,16 @@ function addTouristArea(url, isEdit) {
 
     var info = {
         overay: overlay,
-        position: $('#area-position').val() != 0 ? JSON.parse($('#area-position').val()) : '',
+        position: $('#area-position').val() != '0' ? JSON.parse($('#area-position').val()) : '',
         audio: $('#area-audio-file').html()
     };
 
-    var attraction_list = getAttractions();
+    var attraction_list = getAttractions(0);
+
     var price = 0;
     for (var i = 0; i < attraction_list.length; i++) {
         if (attraction_list[i].trial == '1') continue;
-        price += parseInt(attraction_list[i].price);
+        price += parseFloat(attraction_list[i].price);
     }
 
     var touristArea = {
@@ -975,19 +1049,27 @@ function addTouristArea(url, isEdit) {
         info: JSON.stringify(info),
         point_list: JSON.stringify(attraction_list)
     };
-    console.log(touristArea);
 
-    var area_id = $('#point-list').val();
+
+     var area_id = $('#point-list').val();
     var url_suffix = (area_id == undefined) ? "" : ("/" + area_id);
     $.post(url + "api/Areas/save" + url_suffix, touristArea, function (result) {
+        if((result.id)!=undefined){
+            $('#point-list').val(result.id);
+            touristArea['point_list']=JSON.stringify(getAttractions(parseInt(result.id)));
+            $.post(url + "api/Areas/save/" + result.id, touristArea, function (result) {
+
+
+            });
+        }
         window.alert("景区保存成功。");
         location.href = url + 'area';
     });
 }
 
-function getAttractions() {
+function getAttractions(id) {
     var ret = [];
-    var area_id = $('#point-list').val();
+    var area_id = id ==  0 ? $('#point-list').val(): id;
     var list = document.getElementById('pointList');
     var pointList = list.getElementsByTagName('li');
 
@@ -1000,6 +1082,7 @@ function getAttractions() {
         var pointImage = $(pointInfo[4]).val();
         var pointAudio = $(pointInfo[5]).val();
         var pointFree = $(pointInfo[6]).val();
+
         var point = {
             id: area_id + "_" + (i + 1),
             name: pointName,
@@ -1064,16 +1147,32 @@ function deployArea(url, type) {
 }
 
 function uploadOverlay() {
-    $('#upload-overlay').click();
+    if ($("#page_loaded_status").val() == '1') {
+        $('#upload-overlay').click();
+    } else {
+        alert("页加载中. 请等一下.");
+    }
 }
 function uploadPointImage() {
-    $('#upload-point-image').click();
+    if ($("#page_loaded_status").val() == '1') {
+        $('#upload-point-image').click();
+    } else {
+        alert("页加载中. 请等一下.");
+    }
 }
 function uploadPointAudio() {
-    $('#upload-point-audio').click();
+    if ($("#page_loaded_status").val() == '1') {
+        $('#upload-point-audio').click();
+    } else {
+        alert("页加载中. 请等一下.");
+    }
 }
 function uploadAreaAudio() {
-    $('#upload-area-audio').click();
+    if ($("#page_loaded_status").val() == '1') {
+        $('#upload-area-audio').click();
+    } else {
+        alert("页加载中. 请等一下.");
+    }
 }
 function searchMapArea() {
     var city = $("#city_Name").val();

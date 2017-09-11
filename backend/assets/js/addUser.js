@@ -18,5 +18,11 @@ function cancel(url) {
 
 $(document).ready(function(){
 
+	var status = $("#success_alert").val();
+	console.log(status);
+	if(status!=undefined) {
+		window.alert("添加人员成功.");
+		location.href=baseURL+"userListing";
+	}
 
 });

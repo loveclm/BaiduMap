@@ -116,6 +116,7 @@
                                         if ($shop->phonenumber != $shop_manager_number) continue;
                                     }
 
+
                                     ?>
                                     <tr>
                                         <td><?php echo $item->number; ?></td>
@@ -284,7 +285,7 @@
                                             ?>
                                             <td><?php
                                                 $sh = $this->shop_model->getShopById($item->shop_name);
-                                                echo (isset($sh->name)) ? $sh->name : ''; ?>
+                                                echo (isset($sh->name)) ? $sh->name : '平台'; ?>
                                             </td>
                                             <?php
                                         } ?>

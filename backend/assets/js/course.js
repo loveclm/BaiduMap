@@ -56,13 +56,15 @@ function getAreas() {
     var ret = [];
     var list = $('#courseItems');
     var areaList = list.children();
-
+    var price=0;
     for (var i = 0; i < areaList.length; i++) {
 
         var areaId = $(areaList[i]).attr('data-id');
         var areaTitle = $('#areatitle-' + areaId).text();
-        ret.push({id: areaId, name: areaTitle});
+        price += parseFloat($('#areaprice-'+areaId).text());
+        ret.push({id: areaId, price: price, name: areaTitle});
     }
+    $("#courseprice").val(price);
     return JSON.stringify(ret);
 }
 
@@ -97,8 +99,9 @@ function searchCourse(url) {
 function processCourse(url, id) {
 
     var area = $("#coursename").val();
-    var rate = (100 - parseFloat($("#courserate").val())) / 100;
-    var price = $("#courseprice").val();
+    var rate = (parseFloat($("#courserate").val())) / 100;
+    var price=0;
+    var point_list ='';
     if (area == '') {
         window.alert("请输入线路名称");
         return;
@@ -113,6 +116,8 @@ function processCourse(url, id) {
         overay: 'all_course_image.png',
     };
     if (parseInt(id) != 0) {
+        point_list=getAreas();
+        price = $("#courseprice").val();
         touristArea = {
             id: parseInt(id),
             name: area,
@@ -122,11 +127,13 @@ function processCourse(url, id) {
             status: 0, // 0-usual, 1-unusual,
             type: 1, // 1-course, 2-area
             info: JSON.stringify(info),
-            point_list: getAreas()
+            point_list: point_list
         };
         reqUrl = url + "api/Areas/save/" + id;
     }
     else {
+        point_list=getAreas();
+        price = $("#courseprice").val();
         touristArea = {
             name: area,
             discount_rate: rate,
@@ -135,7 +142,7 @@ function processCourse(url, id) {
             status: 0, // 0-usual,  1-unusual
             type: 1, // 1-course,  2-area
             info: JSON.stringify(info),
-            point_list: getAreas()
+            point_list: point_list
         };
         reqUrl = url + "api/Areas/save";
     }

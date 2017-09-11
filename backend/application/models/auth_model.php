@@ -49,6 +49,7 @@ class auth_model extends CI_Model
         $this->db->select('*');
         $this->db->from('tbl_order');
         $this->db->where('authid', $id);
+        $this->db->where('ordertype', '4');
         $qresult = $this->db->count_all_results();
         return $qresult;
     }
@@ -99,6 +100,7 @@ class auth_model extends CI_Model
         $this->db->select('*');
         $this->db->from('tbl_order');
         $this->db->where('authid', $authid);
+        $this->db->where('ordertype','4');
         $this->db->order_by('authid');
         $this->db->order_by('areaid');
 
@@ -148,6 +150,7 @@ class auth_model extends CI_Model
         $this->db->select('*');
         $this->db->from('tbl_order');
         $this->db->where('authid', $id);
+        $this->db->where('ordertype', '4');
         $this->db->where("userphone <> '0'");
         $qresult = $this->db->count_all_results();
         return $qresult;
@@ -166,6 +169,7 @@ class auth_model extends CI_Model
             $this->db->where('status', $status);
         else if ($status != '0')
             $this->db->where("status <> '1'");
+        $this->db->where("ordertype","4");
         $this->db->order_by('ordered_time', 'desc');
         $query = $this->db->get();
 

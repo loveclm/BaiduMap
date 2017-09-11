@@ -69,7 +69,7 @@
             <div class="row custom-info-row">
                 <label class="col-sm-2">*订单分成比率:</label>
                 <input style="text-align: right;" type="text" class="col-sm-2" id="shoprate"
-                       value="<?php echo isset($shop) ? 100-floatval($shop->discount_rate) * 100 : ''; ?>">
+                       value="<?php echo isset($shop) ? (floatval($shop->discount_rate) * 100) : ''; ?>">
                 <label> % </label>
             </div>
         </div>

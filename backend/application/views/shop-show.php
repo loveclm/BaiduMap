@@ -47,7 +47,7 @@
             <div class="row custom-info-row">
                 <label class="col-sm-2">订单分成比率:</label>
                 <label class="col-sm-2"
-                       id="shoprate"><?php echo isset($shop) ? 100 - floatval($shop->discount_rate) * 100 : ''; ?>
+                       id="shoprate"><?php echo isset($shop) ? (floatval($shop->discount_rate) * 100) : ''; ?>
                     %</label>
             </div>
 
@@ -66,9 +66,8 @@
                                 ?>
                                 <div class="col-sm-6" style="text-align: center;">
                                     <div class="form-inline" id="qr-view-<?php echo $i; ?>"></div>
-                                    <div id="qr-data-url-<?php echo $i; ?>" style="display: none;">
-                                        <?php echo $item->data; ?>
-                                    </div>
+                                    <input id="qr-data-url-<?php echo $i; ?>" style="display: none;" value='<?php echo ("http://www.ayoubc.com/tour?shopid=" . $item->shopid .
+                                            "&type=" . $item->type . "&targetid=" . $item->targetid); ?>'/>
                                     <label class="form-inline"><?php echo $areaName; ?></label>
                                 </div>
                                 <?php
@@ -138,8 +137,8 @@
         if ((document.getElementById("qrcount")) != null) {
             count = $("#qrcount").html();
             for (var i = 0; i < count; i++) {
-                console.log( ($('#qr-data-url-'+i).html().trim()));
-                $('#qr-view-' + i).qrcode({text: $('#qr-data-url-'+i).html().trim()}, {width: 128, height: 128});
+                console.log(($('#qr-data-url-' + i).val()));
+                $('#qr-view-' + i).qrcode({text: $('#qr-data-url-' + i).val()}, {width: 128, height: 128});
             }
         }
     });

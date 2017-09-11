@@ -271,7 +271,7 @@ class shop extends BaseController
                     foreach ($authCodes as $codeItem) {
                         $authcodelist[$i] = [
                             'id' => $i,
-                            'value' => $codeItem->value,
+                            'value' => $codeItem->code,
                         ];
                         $i++;
                     }

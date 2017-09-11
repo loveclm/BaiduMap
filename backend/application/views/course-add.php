@@ -10,15 +10,17 @@
         <div class="container">
             <div class="row custom-info-row">
                 <label class="col-sm-2">旅游线路名称:</label>
-                <input type="text" class="col-sm-4" id="coursename" maxlength="20" value="<?php echo isset($course) ? $course->name : '';?>" />
-                <input type="text" class="col-sm-4" id="courseprice" maxlength="10" value="<?php echo isset($course) ? $course->price : '';?>" style="display: none;"/>
+                <input type="text" class="col-sm-4" id="coursename" maxlength="20"
+                       value="<?php echo isset($course) ? $course->name : '';?>" />
+                <input type="text" class="col-sm-4" id="courseprice" maxlength="10"
+                       value="<?php echo isset($course) ? $course->price : '';?>" style="display: none;"/>
                 <div id="custom-error-coursename" class="custom-error col-sm-4" style="display: none;">线路名称要不超过10个字符</div>
             </div>
             <div class="row custom-info-row">
                 <label class="col-sm-2">旅游线路折扣比率:</label>
                 <input style="text-align: right;" type="text"
                        class="col-sm-1" id="courserate"
-                       value="<?php echo isset($course) ? 100-floatval($course->discount_rate)*100 : '';?>">
+                       value="<?php echo isset($course) ? (floatval($course->discount_rate)*100) : '';?>">
                 <label>%</label>
             </div>
         </div>

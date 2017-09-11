@@ -51,7 +51,7 @@ class systemmanage extends BaseController
 
             $count = $this->user_model->userListingCount($searchText);
 
-            $returns = $this->paginationCompress("userListing/", $count, 5);
+            $returns = $this->paginationCompress("userListing/", $count, 10);
 
             $data['userRecords'] = $this->user_model
                 ->userListing($searchText, $searchStatus, $returns["page"], $returns["segment"]);

@@ -85,7 +85,7 @@ function invalidAccount(account) {
 function processShop(url, id) {
 
     var name = $("#shopname").val();
-    var rate = (100 - parseFloat($("#shoprate").val())) / 100;
+    var rate = (parseFloat($("#shoprate").val())) / 100;
     var account = $("#shopid").val();
     var password = $("#shoppassword").val();
     var type = $('#shoptype :selected').val();
@@ -103,7 +103,7 @@ function processShop(url, id) {
         $('#custom-error-shopname').show();
         return;
     } else $('#custom-error-shopname').hide();
-    if (account.length > 10) {
+    if (account.length > 11) {
         $('#custom-error-shopid').show();
         return;
     } else $('#custom-error-shopid').hide();
@@ -261,7 +261,7 @@ function generateAuth(url, confirm) {
 
 function showQR(url_suffix) {
     $('#custom-generate-qr-view').show();
-    console.log('http://www.ayoubc.com/tour' + url_suffix);
+    console.log('http://www.ayoubc.com/tour' + encodeURI(url_suffix));
     $('#qr-view').qrcode({text: 'http://www.ayoubc.com/tour' + url_suffix});
 }
 

@@ -198,11 +198,13 @@ class ordermanage extends BaseController
         $authCount = count($authList);
         for ($i = 0; $i < $authCount; $i++) {
             $item = $authList[$i];
+            if($item->mobile=='0') continue;
             $shop = $this->shop_model->getShopById($item->shop_name);
+
             if (count($shop) > 0)
                 if ($shop->status != 0) continue;
+            if (count($shop) == 0) continue;
             if ($this->global['shop_manager_number'] != '') {
-                if (count($shop) == 0) continue;
                 if ($shop->phonenumber != $this->global['shop_manager_number']) continue;
             }
 
@@ -211,7 +213,7 @@ class ordermanage extends BaseController
             $output_html .= '<td>' . $item->mobile . '</td>';
             $output_html .= '<td>' . $item->price . '</td>';
             $output_html .= '<td>';
-            $output_html .= ($item->status == '1' ? '先付款' : ($item->status == '2' ? '后付款' : '后付款'));
+            $output_html .= ($item->auth_status == '1' ? '先付款' : ($item->status == '2' ? '后付款' : '后付款'));
             $output_html .= '</td>';
 
             $point_listitem = json_decode($item->point_list);
@@ -226,7 +228,7 @@ class ordermanage extends BaseController
 
             $sh = $this->shop_model->getShopById($item->shop_name);
             if ($this->global['shop_manager_number'] == '') {
-                $output_html .= '<td>' . ((isset($sh->name)) ? $sh->name : '') . '</td>';
+                $output_html .= '<td>' . ((isset($sh->name)) ? $sh->name : '平台') . '</td>';
             }
             $output_html .= '<td>' . $item->ordered_time . '</td>';
             $output_html .= '</tr>';

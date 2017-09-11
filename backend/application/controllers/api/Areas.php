@@ -128,6 +128,7 @@ class Areas extends REST_Controller
         $ext = explode(".", $_FILES[0]['name']);
         $nn = rand(1000, 9999);
         $filename = 'ayoubc' . $nn . $tt . '.' . $ext[1];
+//        var_dump($_FILES);
         foreach ($_FILES as $file) {
 //            if (move_uploaded_file($file['tmp_name'], $uploaddir . (basename($file['name'])))) {
             if (move_uploaded_file($file['tmp_name'], $uploaddir . $filename)) {
@@ -144,13 +145,6 @@ class Areas extends REST_Controller
         } else {
             $this->response(array('status' => false, 'error_message' => 'There was an error uploading your files!'), 404);
         }
-    }
-
-    function calculateMyPrice($phone, $areaid = 0, $attrid = 0)
-    {
-        // get my selected price
-
-        // get real rest price
     }
 
 ///////////////////////////////////////////////////////////
@@ -216,6 +210,9 @@ class Areas extends REST_Controller
                             array(
                                 'id' => $areaData->id,
                                 'name' => $areaData->name,
+                                'cost' => round((floatval($areaData->price)*floatval($areaData->discount_rate) -
+                                    floatval($this->order_model->calculateMyPrice($phone, $areaData->id)))*100)/100,
+                                'discount_rate' => $areaData->discount_rate,
                                 'attractionCnt' => count(json_decode($areaData->point_list))
                             )
                         );
@@ -228,11 +225,13 @@ class Areas extends REST_Controller
                         'id' => $item->id,
                         'name' => $name,    //  $item->name || $name
                         'image' => base_url() . 'uploads/' . $courseInfo->overay,
-                        'cost' => $item->price,
+                        'cost' => round((floatval($item->price)*floatval($item->discount_rate) -
+                            floatval($this->order_model->calculateMyPrice($phone, $item->id)))*100)/100,
                         'discount_rate' => $item->discount_rate,
                         'scenic_areas' => $areas
                     )
                 );
+
             }
             //var_dump($course_list);
             $this->response(array('status' => true, 'Courses' => $course_list), 200);
@@ -256,6 +255,8 @@ class Areas extends REST_Controller
                     array(
                         'id' => $item->id,
                         'name' => $item->name,
+                        'cost' => $item->price,
+                        'discount_rate' => $item->discount_rate,
                         'audio' => base_url() . 'uploads/' . $areainfo->audio
                     )
                 );
@@ -298,13 +299,14 @@ class Areas extends REST_Controller
                         $arInfos = json_decode($csitem->point_list);
                         if (sizeof($arInfos) == 0) continue;
                         foreach ($arInfos as $aritem) {
-                            if ($csitem->id == $aritem->id) {
+                            if ($item->id == $aritem->id) {
                                 array_push($Ids, $csitem->id);
                                 break;
                             }
                         }
                     }
                 }
+
                 $lastOrder = $this->order_model->getOrderByAreaIds($Ids, $mobile);
                 if (count($lastOrder) == 0) continue;
                 $status_ret = $this->order_model->getBuyStatusById($lastOrder->areaid, 1, $mobile);
@@ -319,14 +321,16 @@ class Areas extends REST_Controller
                 array_push(
                     $Auths,
                     array(
-                        'id' => $item->id,
+                        'areaid' => $item->id,
+                        'id' => $lastOrder->id,
                         'name' => $item->name,
-                        'cost' => $item->price,
+                        'cost' => intval($this->order_model->calculateMyPrice($mobile, $item->id)*100)/100,
+                        'paid_price' => $item->price,
                         'discount_rate' => $item->discount_rate,
                         'image' => base_url() . 'uploads/' . $area_info->overay,
                         'order_time' => $lastOrder->ordered_time,
                         'state' => $status_ret,
-                        'type' => $lastOrder->ordertype
+                        'type' => $item->type
                     )
                 );
             }
@@ -437,7 +441,7 @@ class Areas extends REST_Controller
                     return;
                 }
                 $authOrderItem = [
-                    "value" => sprintf("%'.02d%'.08d", '12', $init['num']),
+                    "value" => sprintf("%'.011d", time()),
                     "code" => floor($cost * 100) / 100,
                     "userphone" => $phone,
                     "ordertype" => $type, // 1,2 - course or area
@@ -456,7 +460,7 @@ class Areas extends REST_Controller
                     return;
                 }
                 $authOrderItem = [
-                    "value" => sprintf("%'.02d%'.08d", '12', $init['num']),
+                    "value" => sprintf("%'.011d", time()),
                     "code" => floor($cost * 100) / 100,
                     "userphone" => $phone,
                     "ordertype" => $type, // 3- attraction
@@ -477,11 +481,16 @@ class Areas extends REST_Controller
                         "authid" => $shopid,
                         "paid_time" => $date->format('Y-m-d H:i:s')
                     ];
-                    if (!$this->order_model->addAuthOrder($authOrderItem))
+                    $result = $this->order_model->addAuthOrder($authOrderItem);
+                    if ($result == 0) {
                         $this->response(array('status' => false, 'result' => '-1'), 200);
+                    } else {
+                        $this->response(array('status' => true, 'result' => $authOrderItem['code']), 200);
+                    }
                 }
+                return;
             }
-            $this->response(array('status' => true, 'result' => $authOrderItem['code']), 200);
+            $this->response(array('status' => true, 'result' => $authOrderItem['value']), 200);
         }
     }
 
@@ -489,16 +498,17 @@ class Areas extends REST_Controller
     {
         $request = $this->post();
         $value = $request['id'];// areaid  or courseid or attractionid
-        $value = explode("_", $value);
-        $value = $value[0];
+        //$value = explode("_", $value);
+        //$value = $value[0];
         $phone = $request['phone'];
         $shopid = $request['shop'];
 
         $result = $this->order_model->addPayOrder($value, $phone, $shopid);
-        if ($result == FALSE) {
+        $result[0]['state'] = 1;   // 1- paid
+        if ($result == NULL) {
             $this->response(array('status' => false, 'result' => '-1'), 200);
         } else {
-            $this->response(array('status' => true, 'result' => '1'), 200);
+            $this->response(array('status' => true, 'result' => $result[0]), 200);
         }
     }
 
