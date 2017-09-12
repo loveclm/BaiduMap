@@ -125,7 +125,7 @@ function test_api() {
     var cost = '00505000007';
     var cost = '0.7';
     var type = '2';
-    var id = '01505093495';
+    var id = '01505093497';
     var shopid = '7';
     $.ajax({
         type: 'POST',
@@ -133,7 +133,7 @@ function test_api() {
 //        url: 'http://www.ayoubc.com/backend/api/Areas/getMyOrderInfos',
 //        url: 'http://192.168.2.18/backend/api/Areas/setPayOrder',
 //        url: 'http://192.168.2.18/backend/api/Areas/setAreaBuyOrder',
-        url: 'http://www.ayoubc.com/backend/api/Areas/getAllCourseInfos',
+        url: 'http://www.ayoubc.com/backend/api/Areas/getMyAreaInfos',
         dataType: 'json',
         username: 'admin',
         password: '1234',

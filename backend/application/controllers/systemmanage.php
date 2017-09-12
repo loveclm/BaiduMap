@@ -158,11 +158,12 @@ class systemmanage extends BaseController
                 $result = $this->user_model->addNewUser($userInfo);
 
                 if ($result > 0) {
-                    $this->session->set_flashdata('success', '新用户创建成功.');
+                    $this->session->set_flashdata('success', '添加人员成功.');
+                    redirect('addNew');
                 } else {
-                    $this->session->set_flashdata('error', '用户创建失败. 此帐户已存在了.');
+                    $this->session->set_flashdata('error', '添加人员失败. 此帐户已存在!');
+                    redirect('addNew');
                 }
-                redirect('addNew');
             }
         }
     }
@@ -178,17 +179,17 @@ class systemmanage extends BaseController
             $roleName = $this->input->post('roleName');
             $result = $this->user_model->findRole($roleName);
             if (count($result) > 0) {
-                $this->session->set_flashdata('error', '角色创建失败.');
+                $this->session->set_flashdata('error', '添加角色失败.此角色已存在!');
                 echo(json_encode(array('status' => FALSE)));
                 return;
             }
 
             $result = $this->user_model->addNewRole($roleName);
             if ($result > 0) {
-                $this->session->set_flashdata('success', '新角色创建成功.');
+                $this->session->set_flashdata('success', '添加角色成功.');
                 echo(json_encode(array('status' => TRUE)));
             } else {
-                $this->session->set_flashdata('error', '角色创建失败.');
+                $this->session->set_flashdata('error', '添加角色失败!');
                 echo(json_encode(array('status' => FALSE)));
             }
         }
@@ -211,10 +212,10 @@ class systemmanage extends BaseController
             $result = $this->user_model->updateRole($roleInfo, $roleId);
 
             if ($result == true) {
-                $this->session->set_flashdata('success', '用户更新成功.');
+                $this->session->set_flashdata('success', '修改角色成功.');
                 echo(json_encode(array('status' => TRUE)));
             } else {
-                $this->session->set_flashdata('error', '用户更新失败.');
+                $this->session->set_flashdata('error', '修改角色失败.');
                 echo(json_encode(array('status' => FALSE)));
             }
 
@@ -292,10 +293,10 @@ class systemmanage extends BaseController
                 $result = $this->user_model->editUser($userInfo, $userId);
 
                 if ($result == true) {
-                    $this->session->set_flashdata('success', '用户更新成功.');
+                    $this->session->set_flashdata('success', '修改账号成功.');
                     echo(json_encode(array('status' => TRUE)));
                 } else {
-                    $this->session->set_flashdata('error', '用户更新失败.');
+                    $this->session->set_flashdata('error', '修改账号失败.');
                     echo(json_encode(array('status' => FALSE)));
                 }
 
@@ -394,11 +395,11 @@ class systemmanage extends BaseController
                 $result = $this->user_model->changePassword($this->vendorId, $usersData);
 
                 if ($result > 0) {
-                    $this->session->set_flashdata('success', '密码更新成功.');
+                    $this->session->set_flashdata('success', '修改密码成功.');
                     echo(json_encode(array('status' => TRUE)));
                     redirect('logout');
                 } else {
-                    $this->session->set_flashdata('error', '密码更新失败.');
+                    $this->session->set_flashdata('error', '修改密码失败.');
                     echo(json_encode(array('status' => FALSE)));
                 }
 
@@ -423,10 +424,10 @@ class systemmanage extends BaseController
         $result = $this->user_model->changePassword($id, $usersData);
 
         if ($result > 0) {
-            $this->session->set_flashdata('success', '密码更新成功.');
+            $this->session->set_flashdata('success', '修改密码成功.');
             echo(json_encode(array('status' => TRUE)));
         } else {
-            $this->session->set_flashdata('error', '密码更新失败.');
+            $this->session->set_flashdata('error', '修改密码失败.');
             echo(json_encode(array('status' => FALSE)));
         }
 

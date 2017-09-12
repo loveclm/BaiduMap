@@ -18,7 +18,7 @@
                                         <div class="form-group" style="margin-bottom: 10px;">
                                             <label for="email">&nbsp;&nbsp;&nbsp;*账 号 &nbsp;:&nbsp;</label>
                                             <input type="text" class="form-control required email" id="email"
-                                                   name="email" maxlength="128" value="<?php echo isset($email)?$email:''; ?>">
+                                                   name="email" maxlength="12" value="<?php echo isset($email)?$email:''; ?>">
                                         </div>
                                     </div>
                                     <div class="col-md-12 form-inline">
@@ -79,7 +79,7 @@
                             <!-- /.box-body -->
 
                             <div class="">
-                                <input type="submit" class="btn btn-primary" value="确认"/>
+                                <input type="submit" class="btn btn-primary" value="确认" />
                                 <input type="reset" class="btn btn-default" value="取消" onclick="cancel('<?php echo base_url();?>');" />
                             </div>
                         </form>
@@ -99,9 +99,10 @@
                     $success = $this->session->flashdata('success');
                     if ($success) {
                         ?>
-                        <div class="alert alert-success alert-dismissable">
+                        <div class="alert alert-success alert-dismissable" style="display:none;">
                             <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
-                            <?php echo $this->session->flashdata('success'); ?>
+                            <input type="text" value="<?php echo $this->session->flashdata('success'); ?>"
+                                id="success_message" style="display:none;">
                         </div>
                     <?php } ?>
 

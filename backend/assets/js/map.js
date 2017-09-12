@@ -40,7 +40,7 @@ function initMap(center) {
 
     map = new AMap.Map('custom-map-container', {
         resizeEnable: true,
-        zoom: 14,
+        zoom: 13,
         center: center//地图中心点
     });
 
@@ -108,6 +108,19 @@ function getData(data, level) {
                 mapMarker1.setPosition(cornerLocation);
                 var arr = [leftBottom, rightTop];
                 $('#area-position').val(JSON.stringify(arr));
+
+                for (var i = 0; i < markList.length; i++) {
+
+                    //pos1 = JSON.parse($('#pointposition-' + markList[i]['G']['id']).val());
+
+                    markPosition = currentLocation;
+
+                    $('#pointposition-' + markList[i]['G']['id']).val(JSON.stringify(markPosition));
+
+                    markList[i].setPosition(markPosition);
+                }
+
+
             }, 1000);
         }
 
@@ -129,8 +142,7 @@ function getData(data, level) {
     var subList = data.districtList;
     var contentSub, curlevel, curList;
 
-    if($("#page_loaded_status").val()=='0')
-    {
+    if ($("#page_loaded_status").val() == '0') {
         if ($("#provinceName").html() != '') {
             contentSub = new Option($("#provinceName").html());
             curList = document.querySelector('#province');
@@ -273,7 +285,7 @@ $(document).ready(function () {
         map = new AMap.Map('custom-map-container', {
             resizeEnable: true,
             center: currentLocation,
-            zoom: 12,
+            zoom: 11,
             scrollWheel: true
             //layers: [
             //    new AMap.TileLayer(),
@@ -310,39 +322,7 @@ $(document).ready(function () {
         });
         mapMarker.on('mousemove', function (e) {
             if (dragging) {
-                var target = e['target']['G'];
-                var position = [e['lnglat']['lng'], e['lnglat']['lat']];
-                // calculate moving amount
-                var dx = position[0] - currentLocation[0];
-                var dy = position[1] - currentLocation[1];
-                currentLocation = position;
-                // move overlay
-                leftBottom[0] += dx;
-                leftBottom[1] += dy;
-                rightTop[0] += dx;
-                rightTop[1] += dy;
-
-                for(var i=0; i<markList.length; i++){
-
-                    var pos1 =JSON.parse($('#pointposition-' + markList[i]['G']['id']).val());
-
-                    markList[i]['G']['position']['lng'] =  pos1[0] + dx;
-                    markList[i]['G']['position']['lat'] =  pos1[1] +  dy;
-
-                    markposition=[markList[i]['G']['position']['lng'],markList[i]['G']['position']['lat']];
-
-                    $('#pointposition-' + markList[i]['G']['id']).val(JSON.stringify(markposition));
-
-                    markList[i].setPosition(markposition);
-
-                }
-
-
-                imageLayer.setBounds(new AMap.Bounds(leftBottom, rightTop));
-                cornerLocation = [rightTop[0], leftBottom[1]];
-                mapMarker1.setPosition(cornerLocation);
-                var arr = [leftBottom, rightTop];
-                $('#area-position').val(JSON.stringify(arr));
+                setLayerPosition(e, 0);
             }
         });
         dragging1 = false;
@@ -363,17 +343,7 @@ $(document).ready(function () {
         });
         mapMarker1.on('mousemove', function (e) {
             if (dragging1) {
-                var target = e['target']['G'];
-                var position = [e['lnglat']['lng'], e['lnglat']['lat']];
-                // move overlay
-                rightTop[0] = position[0];
-                leftBottom[1] = position[1];
-                leftBottom[0] = currentLocation[0] - (position[0] - currentLocation[0]);
-                rightTop[1] = currentLocation[1] - (position[1] - currentLocation[1]);
-
-                imageLayer.setBounds(new AMap.Bounds(leftBottom, rightTop));
-                var arr = [leftBottom, rightTop];
-                $('#area-position').val(JSON.stringify(arr));
+                setLayerPosition(e, 1);
             }
         });
         addPointFromArea(url);
@@ -386,7 +356,7 @@ $(document).ready(function () {
         map = new AMap.Map('custom-map-container', {
             resizeEnable: true,
             center: currentLocation,
-            zoom: 14,
+            zoom: 13,
             scrollWheel: true
             //layers: [
             //    new AMap.TileLayer(),
@@ -421,23 +391,7 @@ $(document).ready(function () {
         });
         mapMarker.on('mousemove', function (e) {
             if (dragging) {
-                var target = e['target']['G'];
-                var position = [e['lnglat']['lng'], e['lnglat']['lat']];
-                // calculate moving amount
-                var dx = position[0] - currentLocation[0];
-                var dy = position[1] - currentLocation[1];
-                currentLocation = position;
-                // move overlay
-                leftBottom[0] += dx;
-                leftBottom[1] += dy;
-                rightTop[0] += dx;
-                rightTop[1] += dy;
-
-                imageLayer.setBounds(new AMap.Bounds(leftBottom, rightTop));
-                cornerLocation = [rightTop[0], leftBottom[1]];
-                mapMarker1.setPosition(cornerLocation);
-                var arr = [leftBottom, rightTop];
-                $('#area-position').val(JSON.stringify(arr));
+                setLayerPosition(e, 0);
             }
         });
         mapMarker1 = new AMap.Marker({
@@ -457,20 +411,66 @@ $(document).ready(function () {
         });
         mapMarker1.on('mousemove', function (e) {
             if (dragging1) {
-                var target = e['target']['G'];
-                var position = [e['lnglat']['lng'], e['lnglat']['lat']];
-                // move overlay
-                rightTop[0] = position[0];
-                leftBottom[1] = position[1];
-                leftBottom[0] = currentLocation[0] - (position[0] - currentLocation[0]);
-                rightTop[1] = currentLocation[1] - (position[1] - currentLocation[1]);
-
-                imageLayer.setBounds(new AMap.Bounds(leftBottom, rightTop));
-                var arr = [leftBottom, rightTop];
-                $('#area-position').val(JSON.stringify(arr));
+                setLayerPosition(e, 1);
             }
         });
     }
+
+    function setLayerPosition(e, mode) {
+
+        var target = e['target']['G'];
+        var position = [e['lnglat']['lng'], e['lnglat']['lat']];
+        var pos1 = [];
+        var markPosition = [];
+        if (mode == 0) { // move center point
+            // calculate moving amount
+            var dx = position[0] - currentLocation[0];
+            var dy = position[1] - currentLocation[1];
+            currentLocation = position;
+            // move overlay
+            leftBottom[0] += dx;
+            leftBottom[1] += dy;
+            rightTop[0] += dx;
+            rightTop[1] += dy;
+            for (var i = 0; i < markList.length; i++) {
+
+                pos1 = JSON.parse($('#pointposition-' + markList[i]['G']['id']).val());
+
+                markPosition = [pos1[0] + dx, pos1[1] + dy];
+
+                $('#pointposition-' + markList[i]['G']['id']).val(JSON.stringify(markPosition));
+
+                markList[i].setPosition(markPosition);
+            }
+            cornerLocation = [rightTop[0], leftBottom[1]];
+            mapMarker1.setPosition(cornerLocation);
+        } else if (mode == 1) {
+            // move overlay
+            originalLocation = [rightTop[0], leftBottom[1]];
+            rightTop[0] = position[0];
+            leftBottom[1] = position[1];
+            leftBottom[0] = currentLocation[0] - (position[0] - currentLocation[0]);
+            rightTop[1] = currentLocation[1] - (position[1] - currentLocation[1]);
+
+            var rate = [(originalLocation[0] - currentLocation[0]) / (position[0] - currentLocation[0]),
+                (originalLocation[1] - currentLocation[1]) / (position[1] - currentLocation[1])];
+
+            for (var i = 0; i < markList.length; i++) {
+
+                pos1 = JSON.parse($('#pointposition-' + markList[i]['G']['id']).val());
+                markPosition = [currentLocation[0] + (pos1[0] - currentLocation[0]) / rate[0],
+                    currentLocation[1] + (pos1[1] - currentLocation[1]) / rate[1]];
+                //if(pos1[0]-currentLocation[0]<.0001) markPosition[0] = pos1[0];
+                //if(pos1[1]-currentLocation[1]<.000001) markPosition[1] = pos1[1];
+                $('#pointposition-' + markList[i]['G']['id']).val(JSON.stringify(markPosition));
+                markList[i].setPosition(markPosition);
+            }
+        }
+        imageLayer.setBounds(new AMap.Bounds(leftBottom, rightTop));
+        var arr = [leftBottom, rightTop];
+        $('#area-position').val(JSON.stringify(arr));
+    }
+
     /*
      Event code that find string for Search of Tourist Area
      */
@@ -546,7 +546,7 @@ $(document).ready(function () {
                             map = new AMap.Map('custom-map-container', {
                                 resizeEnable: true,
                                 center: currentLocation,
-                                zoom: 14,
+                                zoom: 13,
                             });
                         }
 
@@ -801,14 +801,14 @@ function showPointMarker() {
         draggable: true,
         id: markerId
     });
+    var position = map.getCenter();
+
+    $('#point-position-temp').val(JSON.stringify([position['lng'],position['lat']]));
     marker.on('dragend', function (e) {
         var target = e['target']['G'];
         var position = [e['lnglat']['lng'], e['lnglat']['lat']];
-        //markList[target['id']].setPosition(position);
-        //markList[target['id']]['G']['position']['lng']=position[0];
-        //markList[target['id']]['G']['position']['lat']=position[1];
-        $('#pointposition-' + target['id']).val(JSON.stringify(position));
-        console.log(e);
+        $('#point-position-temp').val(JSON.stringify(position));
+        console.log($('#point-position-temp').val());
     });
 }
 // Add attraction to Tourist Area
@@ -844,13 +844,14 @@ function addPointFromArea(url) {
                 var target = e['target']['G'];
                 var position = [e['lnglat']['lng'], e['lnglat']['lat']];
                 $('#pointposition-' + target['id']).val(JSON.stringify(position));
+                console.log(target['id']);
             });
 
             marker.on('click', function (e) {
                 var target = e['target']['G'];
                 var targetId = target['id'];
                 showEditPoint(targetId);
-                console.log(e);
+                console.log(targetId);
             });
 
             markList.push(marker);
@@ -893,18 +894,16 @@ function addPoint(param) {
     if (param == 1) {
 
         var pointIndex = $('#point-view-index').val();
-        var ptCenter = map.getCenter();
-
+        var ptCenter = JSON.parse($('#point-position-temp').val());
+        console.log(ptCenter+",,,"+pointIndex);
+        $('#point-position-temp').val('');
         if (pointIndex == '0') {
 
             marker.on('dragend', function (e) {
                 var target = e['target']['G'];
                 var position = [e['lnglat']['lng'], e['lnglat']['lat']];
-                //markList[target['id']].setPosition(position);
-                //markList[target['id']]['G']['position']['lng']=position[0];
-                //markList[target['id']]['G']['position']['lat']=position[1];
                 $('#pointposition-' + target['id']).val(JSON.stringify(position));
-                console.log(e);
+                console.log(target['id']);
             });
 
             marker.on('click', function (e) {
@@ -912,7 +911,7 @@ function addPoint(param) {
                 var target = e['target']['G'];
                 var targetId = target['id'];
                 showEditPoint(targetId);
-                console.log(e);
+                console.log(targetId);
             });
 
             markList.push(marker);
@@ -920,7 +919,7 @@ function addPoint(param) {
             $("#pointList").append("<li id='pointitem-" + markerId + "'><div class='col-sm-6'>" + pointName + "</div>" +
                 "<input style='display: none;' value='" + pointDescription + "'/>" +
                 "<input style='display: none;' value='" + pointPrice + "'/>" +
-                "<input id='pointposition-" + markerId + "' style='display: none;' value='" + JSON.stringify([ptCenter['lng'], ptCenter['lat']]) + "'/>" +
+                "<input id='pointposition-" + markerId + "' style='display: none;' value='" + JSON.stringify([ptCenter[0], ptCenter[1]]) + "'/>" +
                 "<input style='display: none;' value='" + pointImage + "'/>" +
                 "<input style='display: none;' value='" + pointAudio + "'/>" +
                 "<input style='display: none;' value='" + pointFree + "'/>" +
@@ -1027,7 +1026,7 @@ function addTouristArea(url, isEdit) {
 
     var info = {
         overay: overlay,
-        position: $('#area-position').val() != '0' ? JSON.parse($('#area-position').val()) : '',
+        position: (($('#area-position').val() != '') ? JSON.parse($('#area-position').val()) : ''),
         audio: $('#area-audio-file').html()
     };
 
@@ -1051,12 +1050,12 @@ function addTouristArea(url, isEdit) {
     };
 
 
-     var area_id = $('#point-list').val();
+    var area_id = $('#point-list').val();
     var url_suffix = (area_id == undefined) ? "" : ("/" + area_id);
     $.post(url + "api/Areas/save" + url_suffix, touristArea, function (result) {
-        if((result.id)!=undefined){
+        if ((result.id) != undefined) {
             $('#point-list').val(result.id);
-            touristArea['point_list']=JSON.stringify(getAttractions(parseInt(result.id)));
+            touristArea['point_list'] = JSON.stringify(getAttractions(parseInt(result.id)));
             $.post(url + "api/Areas/save/" + result.id, touristArea, function (result) {
 
 
@@ -1069,7 +1068,7 @@ function addTouristArea(url, isEdit) {
 
 function getAttractions(id) {
     var ret = [];
-    var area_id = id ==  0 ? $('#point-list').val(): id;
+    var area_id = id == 0 ? $('#point-list').val() : id;
     var list = document.getElementById('pointList');
     var pointList = list.getElementsByTagName('li');
 

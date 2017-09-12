@@ -379,7 +379,7 @@
                             <input type="text" class="form-control" id="pointdescription" maxlength="40">
                         </div>
 
-                        <div class="form-group">
+                        <div class="form-group" style="display: none;">
                             <input id="upload-point-image" type="file" style="display: none;">
                             <input id="pointimage" value="" style="display: none;"/>
                             <label>上传图片：</label>
@@ -389,7 +389,8 @@
                             <span id="point-image-message" ></span>
                         </div>
 
-                        <div class="form-group" style="height: 150px;width: 100%;">
+                        <input id="point-position-temp" value="" style="display: block;">
+                        <div class="form-group" style="height: 150px;width: 100%; display: none;">
                             <img id="point-item-image" style="height: 150px;width: 100%; display:none;" src=""/>
                         </div>
 
@@ -413,7 +414,7 @@
                             <input type="checkbox" id="pointfree"/> 试听
                         </div>
 
-                        <div class="form-group">
+                        <div class="form-group" style="text-align: center">
                             <button class="btn btn-default" type="button" onclick="addPoint(0);">取消</button>
                             <button class="btn btn-primary" type="button" onclick="addPoint(1);">完成</button>
                         </div>

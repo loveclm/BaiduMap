@@ -27,7 +27,7 @@ class order_model extends CI_Model
                 //$likeCriteria = "(trp.name  LIKE '%" . $name . "%')";
                 break;
         }
-        //$this->db->where($likeCriteria);
+        $this->db->where($likeCriteria);
         if ($stDate != '') $this->db->where("date(od.ordered_time) >= '" . date($stDate) . "'");
         if ($enDate != '') $this->db->where("date(od.ordered_time) <= '" . date($enDate) . "'");
 
@@ -142,18 +142,22 @@ class order_model extends CI_Model
     {
         $this->db->select('*');
         $this->db->from('tbl_order');
-        foreach ($Ids as $id) {
-            $this->db->or_where('areaid', $id);  // all courses
-        }
         $this->db->where('userphone', $phone);
         $this->db->order_by('ordered_time', 'desc');
         $query = $this->db->get();
         $result = $query->result();
         if (count($result) == 0) return NULL;
-        return $result[0];
+        foreach ($result as $item) {
+            foreach($Ids as $id) {
+                if ($item->areaid == $id) {
+                    return $item;
+                }
+            }
+        }
+        return NULL;
     }
 
-    function getStatusByAttractionId($id, $mobile ='')
+    function getStatusByAttractionId($id, $mobile = '')
     {
         $areaIds = $this->getAreaIdsByAttractionId($id);
         $buystatus = 3;//unpaid
@@ -176,16 +180,19 @@ class order_model extends CI_Model
     {
         $this->db->select('*');
         $this->db->from('tbl_order');
-        if ($type == 0)  // 0-attraction, 1-area, 2-course
+        if ($type == 0) {        //0:attraction , 1:area , 2:course
             $this->db->where('attractionid', $id);
-        else
+        } else {
             $this->db->where('areaid', $id);
+            $this->db->where('attractionid', 0);
+        }
         $this->db->where('userphone', $phone);
-        $this->db->order_by('ordered_time', 'DESC');
-
+        $this->db->order_by('ordered_time', 'DEC');
         $query = $this->db->get();
         $result = $query->result();
-        if (count($result) == 0) return 0;// unused
+
+        if (count($result) == 0) return 0;  //unpaid
+
         return $this->setStatusByOrderId($result[0]->id);
     }
 
@@ -194,6 +201,8 @@ class order_model extends CI_Model
         $this->db->select('*');
         $this->db->from('tbl_order');
         $this->db->where('id', $id);
+        $this->db->where('status <> 3');
+
         $query = $this->db->get();
         $qresult = $query->result();
         if (count($qresult) == 0) return 0;
@@ -243,7 +252,7 @@ class order_model extends CI_Model
             foreach ($areaInfos as $item) {
                 $areaInfo = $this->area_model->getAreaById($item->id);
                 if ($this->getBuyStatusById($item->id, 1, $phone) == 1) {
-                    $price += floatval($areaInfo->price)*floatval($areaItem->discount_rate);
+                    $price += floatval($areaInfo->price) * floatval($areaItem->discount_rate);
                 }
             }
         } else if ($type == 2) { // area
@@ -253,8 +262,8 @@ class order_model extends CI_Model
                 //var_dump($retStatus);
                 //var_dump($item);
                 if ($retStatus == 2) {
-                    if ($item->trial != 1) $price += floatval($item->price)*floatval($areaItem->discount_rate);
-                  //  var_dump($price);
+                    if ($item->trial != 1) $price += floatval($item->price) * floatval($areaItem->discount_rate);
+                    //  var_dump($price);
                 }
             }
         }
@@ -274,12 +283,13 @@ class order_model extends CI_Model
             foreach ($orders as $item) {
                 $i++;
                 $Types = $item->ordertype;
+                //if ($item->status == 3) continue;
                 if ($Types == '4') { // auth order
                     $areaitem = $this->area_model->getAreaByAuthId($item->authid);
                     if (count($areaitem) == 0) continue;
                     $area_info = json_decode($areaitem->info);
-                    $kind=$areaitem->type;
-                    if($item->attractionid!=0) $kind=3;
+                    $kind = $areaitem->type;
+                    if ($item->attractionid != 0) $kind = 3;
                     array_push(
                         $Auths,
                         array(
@@ -291,7 +301,7 @@ class order_model extends CI_Model
                             'image' => base_url() . 'uploads/' . $area_info->overay,
                             'pay_method' => 2, // auth order
                             'value' => $item->code,
-                            'cost' => intval($this->calculateMyPrice($mobile, $item->areaid)*100)/100,
+                            'cost' => intval($this->calculateMyPrice($mobile, $item->areaid) * 100) / 100,
                             'paid_price' => $areaitem->price,
                             'discount_rate' => $areaitem->discount_rate,
                             'order_time' => $item->ordered_time,
@@ -319,7 +329,7 @@ class order_model extends CI_Model
                             'image' => base_url() . 'uploads/' . $area_info->overay,
                             'pay_method' => 1, // buy order
                             'value' => $item->code,
-                            'cost' => intval($this->calculateMyPrice($mobile, $item->areaid)*100)/100,
+                            'cost' => intval($this->calculateMyPrice($mobile, $item->areaid) * 100) / 100,
                             'origin_price' => $areaitem->price,
                             'discount_rate' => $areaitem->discount_rate,
                             'order_time' => $item->ordered_time,
@@ -400,6 +410,96 @@ class order_model extends CI_Model
      * This function is used to add new shop to system
      * @return number $insert_id : This is last inserted id
      */
+    function cancelBuyOrder($value, $phone)
+    {
+        $this->db->select('*');
+        $this->db->from('tbl_order');
+        $this->db->where('value', $value);
+        $this->db->where('userphone', $phone);
+        $this->db->where('ordertype <> 4'); // if no auth codes
+        $this->db->where('status', '2'); // if unpaid
+        $query = $this->db->get();
+
+        $result = $query->result();
+
+        if (count($result) == 0)
+            return array();
+
+        $orderInfo = $result[0];
+        $orderInfo->status = 3; // canceled
+        $date = new DateTime();
+        $orderInfo->canceled_time = date_format($date, "Y-m-d H:i:s");
+        $this->db->where('id', $orderInfo->id);
+        $this->db->update('tbl_order', $orderInfo);
+        $insert_id = $result[0]->id;
+
+        $item = $orderInfo;
+        $Types = $item->ordertype;
+        $Auths = array();
+        if ($Types == '2' || $Types == '1') { //buy course or area suoyou
+            $areaitem = $this->area_model->getAreaById($item->areaid);
+            if (count($areaitem) != 0) {
+                $attritem = json_decode($areaitem->point_list);
+                $area_info = json_decode($areaitem->info);
+                array_push(
+                    $Auths,
+                    array(
+                        'id' => $item->value,
+                        'name' => $this->area_model->getCourseNameByAreaId($item->areaid),
+                        'areaid' => $item->areaid,
+                        'attractionid' => $item->attractionid,
+                        'order_kind' => $Types,
+                        'image' => base_url() . 'uploads/' . $area_info->overay,
+                        'pay_method' => 1, // buy order
+                        'value' => $item->code,
+                        'cost' => intval($this->calculateMyPrice($phone, $item->areaid) * 100) / 100,
+                        'origin_price' => $areaitem->price,
+                        'discount_rate' => $areaitem->discount_rate,
+                        'order_time' => $item->ordered_time,
+                        'paid_time' => $item->paid_time,
+                        'expiration_time' => date_format(date_create($item->ordered_time), "Y.m.d") .
+                            ' - ' . date_format(date_create($item->expiration_time), "Y.m.d"),
+                        'canceled_time' => $item->canceled_time,
+                        'state' => $item->status
+                    )
+                );
+            }
+        } else { //buy attraction
+            $areaitem = $this->area_model->getAreaById($item->areaid);
+            if (count($areaitem) != 0) {
+                $attritem = json_decode($areaitem->point_list);
+                $attr_id = explode('_', $item->attractionid);
+                $attritem = $attritem[$attr_id[1] - 1];
+                array_push(
+                    $Auths,
+                    array(
+                        'id' => $item->value,
+                        'name' => $attritem->name,
+                        'areaid' => $item->areaid,
+                        'attractionid' => $item->attractionid,
+                        'order_kind' => $Types,
+                        'image' => base_url() . 'uploads/' . $attritem->image,
+                        'pay_method' => 1, // buy order
+                        'value' => $item->code,
+                        'cost' => $attritem->price,
+                        'discount_rate' => $attritem->discount_rate,
+                        'order_time' => $item->ordered_time,
+                        'paid_time' => $item->paid_time,
+                        'expiration_time' => date_format(date_create($item->ordered_time), "Y.m.d") .
+                            ' - ' . date_format(date_create($item->expiration_time), "Y.m.d"),
+                        'canceled_time' => $item->canceled_time,
+                        'state' => $item->status
+                    )
+                );
+            }
+        }
+        return $Auths;
+    }
+
+    /**
+     * This function is used to add new shop to system
+     * @return number $insert_id : This is last inserted id
+     */
     function addAuthOrder($authInfo)
     {
         $this->db->select('*');
@@ -457,10 +557,10 @@ class order_model extends CI_Model
         $this->db->where('id', $OrderInfo->id);
         $this->db->update('tbl_order', $OrderInfo);
         $OrderInfo->status = $this->setStatusByOrderId($OrderInfo->id);
-        $item=$OrderInfo;
-        $mobile=$phone;
+        $item = $OrderInfo;
+        $mobile = $phone;
         $Types = $item->ordertype;
-        $Auths=array();
+        $Auths = array();
         if ($Types == '4') { // auth order
             $areaitem = $this->area_model->getAreaByAuthId($item->authid);
             if (count($areaitem) != 0) {
@@ -492,7 +592,7 @@ class order_model extends CI_Model
             }
         } else if ($Types == '2' || $Types == '1') { //buy course or area suoyou
             $areaitem = $this->area_model->getAreaById($item->areaid);
-            if (count($areaitem) != 0){
+            if (count($areaitem) != 0) {
                 $attritem = json_decode($areaitem->point_list);
                 $area_info = json_decode($areaitem->info);
                 array_push(

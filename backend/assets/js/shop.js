@@ -94,7 +94,7 @@ function processShop(url, id) {
     var cityText = $('#cityName').html();
     var districtText = $('#districtName').html();
     if (districtText == '' || cityText == '' || provinceText == '') {
-        window.alert("请选择地址.");
+        window.alert("请填写所有信息!.");
         return;
     }
     var address = provinceText + "," +

@@ -210,8 +210,8 @@ class Areas extends REST_Controller
                             array(
                                 'id' => $areaData->id,
                                 'name' => $areaData->name,
-                                'cost' => round((floatval($areaData->price)*floatval($areaData->discount_rate) -
-                                    floatval($this->order_model->calculateMyPrice($phone, $areaData->id)))*100)/100,
+                                'cost' => round((floatval($areaData->price) * floatval($areaData->discount_rate) -
+                                            floatval($this->order_model->calculateMyPrice($phone, $areaData->id))) * 100) / 100,
                                 'discount_rate' => $areaData->discount_rate,
                                 'attractionCnt' => count(json_decode($areaData->point_list))
                             )
@@ -225,8 +225,8 @@ class Areas extends REST_Controller
                         'id' => $item->id,
                         'name' => $name,    //  $item->name || $name
                         'image' => base_url() . 'uploads/' . $courseInfo->overay,
-                        'cost' => round((floatval($item->price)*floatval($item->discount_rate) -
-                            floatval($this->order_model->calculateMyPrice($phone, $item->id)))*100)/100,
+                        'cost' => round((floatval($item->price) * floatval($item->discount_rate) -
+                                    floatval($this->order_model->calculateMyPrice($phone, $item->id))) * 100) / 100,
                         'discount_rate' => $item->discount_rate,
                         'scenic_areas' => $areas
                     )
@@ -298,6 +298,7 @@ class Areas extends REST_Controller
                     foreach ($courseItems as $csitem) {
                         $arInfos = json_decode($csitem->point_list);
                         if (sizeof($arInfos) == 0) continue;
+
                         foreach ($arInfos as $aritem) {
                             if ($item->id == $aritem->id) {
                                 array_push($Ids, $csitem->id);
@@ -309,14 +310,28 @@ class Areas extends REST_Controller
 
                 $lastOrder = $this->order_model->getOrderByAreaIds($Ids, $mobile);
                 if (count($lastOrder) == 0) continue;
-                $status_ret = $this->order_model->getBuyStatusById($lastOrder->areaid, 1, $mobile);
-                if ($status_ret == '4') { // 1-using, 2-unpaid, 3-canceled, 4-expired
-                    $status_ret = 2; // 2-expired
-                } else if ($status_ret == '1') {
-                    $status_ret = 1; // 1-using
+
+                if ($lastOrder->status != '1') {
+                    if ($lastOrder->status == 3 || $lastOrder->status == 2) continue;
+                    if ($lastOrder->ordertype == '2' || $lastOrder->ordertype == '4') {
+                        $status_ret = $this->order_model->getBuyStatusById($lastOrder->areaid, 1, $mobile); // 0-attr, 1-area, 2- course
+                    } else if ($lastOrder->ordertype == '3') {
+                        $status_ret = $this->order_model->getBuyStatusById($lastOrder->attractionid, 0, $mobile); // 0-attr, 1-area, 2- course
+                    } else if ($lastOrder->ordertype == '1') {
+                        $status_ret = $this->order_model->getBuyStatusById($lastOrder->areaid, 2, $mobile); // 0-attr, 1-area, 2- course
+                    }
+                    //$status_ret = $lastOrder->status;
+                    if ($status_ret == '4') { // 1-using, 2-unpaid, 3-canceled, 4-expired
+                        $status_ret = 2; // 2-expired
+                    } else if ($status_ret == '1') {
+                        $status_ret = 1; // 1-using
+                    } else {
+                        continue;
+                    }
                 } else {
-                    continue;
+                    $status_ret = 1;
                 }
+
                 $area_info = json_decode($item->info);
                 array_push(
                     $Auths,
@@ -324,7 +339,7 @@ class Areas extends REST_Controller
                         'areaid' => $item->id,
                         'id' => $lastOrder->id,
                         'name' => $item->name,
-                        'cost' => intval($this->order_model->calculateMyPrice($mobile, $item->id)*100)/100,
+                        'cost' => intval($this->order_model->calculateMyPrice($mobile, $item->id) * 100) / 100,
                         'paid_price' => $item->price,
                         'discount_rate' => $item->discount_rate,
                         'image' => base_url() . 'uploads/' . $area_info->overay,
@@ -512,32 +527,21 @@ class Areas extends REST_Controller
         }
     }
 
-
     public function setCancelOrder_post()
     {
         $request = $this->post();
         $valueid = $request['id'];
         $phone = $request['phone'];
 
-        $orderData = $this->order_model->getOrdersByUser($phone);
-        $date = new DateTime();
-
+        $result = $this->order_model->cancelBuyOrder($valueid, $phone);
         if ($phone == '' || $valueid == '') {
             $this->response(array('status' => false, 'result' => '-1'), 200);
-        } else if (count($orderData) == 0) {
+        } else if (count($result) == 0) {
             $this->response(array('status' => false, 'result' => '-1'), 200);
         } else {
-            $savingData = NULL;
-            $i = 0;
-            foreach ($orderData as $item) {
-                $item->status = 4;
-                $savingData[$i] = $item;
-            }
-
-            $this->response(array('status' => true, 'result' => '1'), 200);
+            $this->response(array('status' => true, 'result' => $result), 200);
         }
     }
-
 }
 
 /* End of file Areas.php */
