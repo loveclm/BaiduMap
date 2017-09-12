@@ -66,7 +66,7 @@
                                 ?>
                                 <div class="col-sm-6" style="text-align: center;">
                                     <div class="form-inline" id="qr-view-<?php echo $i; ?>"></div>
-                                    <input id="qr-data-url-<?php echo $i; ?>" style="display: none;" value='<?php echo ("http://www.ayoubc.com/tour?shopid=" . $item->shopid .
+                                    <input id="qr-data-url-<?php echo $i; ?>" style="display: none;" value='<?php echo ("http://www.ayoubc.com/tour/index.php?shopid=" . $item->shopid .
                                             "&type=" . $item->type . "&targetid=" . $item->targetid); ?>'/>
                                     <label class="form-inline"><?php echo $areaName; ?></label>
                                 </div>

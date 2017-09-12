@@ -31,19 +31,20 @@ var mapMarker1 = null;
 var dragging = false;
 var dragging1 = false;
 var cornerLocation = [];
+var zoom_data;
 
 /* function: initMap
  description: Init AMap using center position and add AMap.MouseTool plugin
  param: center // center position of current map view
  */
 function initMap(center) {
-
+    zoom_data = parseInt($("#map_zoom_data").val());
+    if($("#map_zoom_data").val()==undefined) zoom_data=13;
     map = new AMap.Map('custom-map-container', {
         resizeEnable: true,
-        zoom: 13,
+        zoom: zoom_data,
         center: center//地图中心点
     });
-
     citySelect = document.getElementById('city');
     districtSelect = document.getElementById('district');
     areaSelect = document.getElementById('street');
@@ -285,7 +286,7 @@ $(document).ready(function () {
         map = new AMap.Map('custom-map-container', {
             resizeEnable: true,
             center: currentLocation,
-            zoom: 11,
+            zoom: zoom_data,
             scrollWheel: true
             //layers: [
             //    new AMap.TileLayer(),
@@ -356,7 +357,7 @@ $(document).ready(function () {
         map = new AMap.Map('custom-map-container', {
             resizeEnable: true,
             center: currentLocation,
-            zoom: 13,
+            zoom: zoom_data,
             scrollWheel: true
             //layers: [
             //    new AMap.TileLayer(),
@@ -546,7 +547,7 @@ $(document).ready(function () {
                             map = new AMap.Map('custom-map-container', {
                                 resizeEnable: true,
                                 center: currentLocation,
-                                zoom: 13,
+                                zoom: zoom_data,
                             });
                         }
 
@@ -578,9 +579,7 @@ $(document).ready(function () {
                 // STOP LOADING SPINNER
             }
         });
-
     }
-
 
     //upload image for attraction
     $('#upload-point-image').on('change', uploadPointImage);
@@ -1027,8 +1026,10 @@ function addTouristArea(url, isEdit) {
     var info = {
         overay: overlay,
         position: (($('#area-position').val() != '') ? JSON.parse($('#area-position').val()) : ''),
-        audio: $('#area-audio-file').html()
+        audio: $('#area-audio-file').html(),
+        zoom: map.getZoom()
     };
+    console.log(info);
 
     var attraction_list = getAttractions(0);
 
@@ -1048,7 +1049,6 @@ function addTouristArea(url, isEdit) {
         info: JSON.stringify(info),
         point_list: JSON.stringify(attraction_list)
     };
-
 
     var area_id = $('#point-list').val();
     var url_suffix = (area_id == undefined) ? "" : ("/" + area_id);

@@ -13,10 +13,12 @@
         border-radius: 3px;
         line-height: 36px;
     }
-    #tip select{
-        width:100px;
-        height:30px;
+
+    #tip select {
+        width: 100px;
+        height: 30px;
     }
+
     .amap-indoor-map .label-canvas {
         position: absolute;
         top: 0;
@@ -266,7 +268,7 @@
     <!-- Content Header (Page header) -->
     <section class="content-header">
         <h1>
-            <?php echo ($isEdit=='0')?'新增景区':'编辑景区'; ?>
+            <?php echo ($isEdit == '0') ? '新增景区' : '编辑景区'; ?>
         </h1>
     </section>
 
@@ -275,7 +277,7 @@
         <?php
         if (isset($area)) {
             $areaInfo = json_decode($area->info);
-            //var_dump(json_encode($areaInfo->position));
+            //var_dump($areaInfo->zoom);
         }
         ?>
         <div class="container">
@@ -310,130 +312,132 @@
                 <div id="tip" class="form-group">
                     <label for="exampleInputName2">所属地区：</label>
                     <?php
-                        $address = isset($area) ? ($area->address) : '';
-                        $addrs = explode(',', $address);
+                    $address = isset($area) ? ($area->address) : '';
+                    $addrs = explode(',', $address);
                     ?>
                     <select id='province' onchange='search(this)'></select>
                     <select id='city' onchange='search(this)'></select>
                     <select id='district' onchange='search(this)'></select>
                     <select id='street' onchange='setCenter(this)' style="display: none;"></select>
-                    <div id="provinceName" style="display: none;"><?php echo $address!=''? ($addrs[0]) : ''; ?></div>
-                    <div id="cityName" style="display: none;"><?php echo $address!='' ? ($addrs[1]) : ''; ?></div>
-                    <div id="districtName" style="display: none;"><?php echo $address!='' ? ($addrs[2]) : ''; ?></div>
+                    <div id="provinceName" style="display: none;"><?php echo $address != '' ? ($addrs[0]) : ''; ?></div>
+                    <div id="cityName" style="display: none;"><?php echo $address != '' ? ($addrs[1]) : ''; ?></div>
+                    <div id="districtName" style="display: none;"><?php echo $address != '' ? ($addrs[2]) : ''; ?></div>
                 </div>
-            </div>
-            <div class="row">
-                <div class="form-inline">
-                    <div class="form-group area-add-view">
-                        <label for="exampleInputName2">景区折扣比率:</label>
-                        <input type="text" class="form-control" id="arearate"
-                               value="<?php echo isset($area) ? (floatval($area->discount_rate) * 100) : ''; ?>">
-                        <label">%</label>
-                    </div>
-                </div>
-                <div class="col-sm-8">
-                    <div class="form-group col-md-12" style="position: absolute; z-index: 1000;">
-                        <input class="btn btn-default" id="city_Name" type="text" placeholder="输入您要定位的地址"
-                               value="<?php echo isset($addrs[3])!='' ? ($addrs[3]) : ''; ?>" />
-
-                        <input id="area-position" style="display: none;"
-                               value="<?php echo isset($area) ? json_encode($areaInfo->position) : ''; ?>"/>
-                        <a href="#" class="btn btn-default" onclick="searchMapArea();">
-                            <i class="fa fa-search"></i>
-                        </a>
-                    </div>
-                    <!-- ////////////////////GaoDe Map Part  -->
-                    <div id="custom-map-container" style="height: 600px;"></div>
-                    <!-- ////////////////////                -->
-                </div>
-                <div id="detail_editing_panel" class="col-sm-3"
-                     style="display:<?php echo $isEdit == '0' ? 'none' : 'block'; ?>; border: 1px solid;height: 600px;">
-
-                    <div class="point-list-view">
-                        <div class="form-group col-sm-6">
-                            <button class="btn btn-primary" type="button" onclick="showAddPoint();">标记景点</button>
+                <input id="map_zoom_data" style="display: none;"
+                       value="<?= isset($areaInfo->zoom) ? $areaInfo->zoom : '13'; ?>">
+                </input>
+                <div class="row">
+                    <div class="form-inline">
+                        <div class="form-group area-add-view">
+                            <label for="exampleInputName2">景区折扣比率:</label>
+                            <input type="text" class="form-control" id="arearate"
+                                   value="<?php echo isset($area) ? (floatval($area->discount_rate) * 100) : ''; ?>">
+                            <label">%</label>
                         </div>
-                        <div class="form-group col-sm-6">
-                            <input id="upload-overlay" type="file" style="display: none;"/>
-                            <button class="btn btn-primary" type="button" onclick="uploadOverlay();">上传覆盖图</button>
-                            <input id="area-overlay" value="<?php echo isset($area) ? ($areaInfo->overay) : ''; ?>"
-                                   style="display: none;"/>
-                        </div>
-                        <div id="area-image-message" style="text-align: right; margin:20px;"></div>
-                        <div class="form-group">
-                            <div id="pointList">
+                    </div>
+                    <div class="col-sm-8">
+                        <div class="form-group col-md-12" style="position: absolute; z-index: 1000;">
+                            <input class="btn btn-default" id="city_Name" type="text" placeholder="输入您要定位的地址"
+                                   value="<?php echo isset($addrs[3]) != '' ? ($addrs[3]) : ''; ?>"/>
 
+                            <input id="area-position" style="display: none;"
+                                   value="<?php echo isset($area) ? json_encode($areaInfo->position) : ''; ?>"/>
+                            <a href="#" class="btn btn-default" onclick="searchMapArea();">
+                                <i class="fa fa-search"></i>
+                            </a>
+                        </div>
+                        <!-- ////////////////////GaoDe Map Part  -->
+                        <div id="custom-map-container" style="height: 600px;"></div>
+                        <!-- ////////////////////                -->
+                    </div>
+                    <div id="detail_editing_panel" class="col-sm-3"
+                         style="display:<?php echo $isEdit == '0' ? 'none' : 'block'; ?>; border: 1px solid;height: 600px;">
+
+                        <div class="point-list-view">
+                            <div class="form-group col-sm-6">
+                                <button class="btn btn-primary" type="button" onclick="showAddPoint();">标记景点</button>
+                            </div>
+                            <div class="form-group col-sm-6">
+                                <input id="upload-overlay" type="file" style="display: none;"/>
+                                <button class="btn btn-primary" type="button" onclick="uploadOverlay();">上传覆盖图</button>
+                                <input id="area-overlay" value="<?php echo isset($area) ? ($areaInfo->overay) : ''; ?>"
+                                       style="display: none;"/>
+                            </div>
+                            <div id="area-image-message" style="text-align: right; margin:20px;"></div>
+                            <div class="form-group">
+                                <div id="pointList">
+
+                                </div>
                             </div>
                         </div>
+
+                        <div class="point-add-view" style="display: none;">
+                            <input id="point-view-index" style="display: none;" value="0"/>
+
+                            <div class="form-group">
+                                <label>景点名称：</label>
+                                <input type="text" class="form-control" id="pointname" maxlength="20">
+                            </div>
+                            <div class="form-group">
+                                <label>景点简述：</label>
+                                <input type="text" class="form-control" id="pointdescription" maxlength="40">
+                            </div>
+
+                            <div class="form-group" style="display: none;">
+                                <input id="upload-point-image" type="file" style="display: none;">
+                                <input id="pointimage" value="" style="display: none;"/>
+                                <label>上传图片：</label>
+                                <a class="btn btn-primary" onclick="uploadPointImage();">
+                                    <span>上传图片</span>
+                                </a>
+                                <span id="point-image-message"></span>
+                            </div>
+
+                            <input id="point-position-temp" value="" style="display: block;">
+                            <div class="form-group" style="height: 150px;width: 100%; display: none;">
+                                <img id="point-item-image" style="height: 150px;width: 100%; display:none;" src=""/>
+                            </div>
+
+                            <div class="form-group">
+                                <label>上传录音：</label>
+                                <a class="btn btn-primary" onclick="uploadPointAudio();">
+                                    <span>上传录音</span>
+                                </a>
+                                <input id="upload-point-audio" type="file" style="display: none;">
+                                <label id="pointaudio" value="" style="display: none"></label>
+                                <a href="#" id="pointaudio_view"
+                                   onclick="$('#pointaudio_view').html('');"></a>
+                            </div>
+
+                            <div class="form-group">
+                                <label>景点价格：</label>
+                                <input type="text" class="form-control" id="pointprice">
+                            </div>
+
+                            <div class="form-group">
+                                <input type="checkbox" id="pointfree"/> 试听
+                            </div>
+
+                            <div class="form-group" style="text-align: center">
+                                <button class="btn btn-default" type="button" onclick="addPoint(0);">取消</button>
+                                <button class="btn btn-primary" type="button" onclick="addPoint(1);">完成</button>
+                            </div>
+
+                        </div>
                     </div>
 
-                    <div class="point-add-view" style="display: none;">
-                        <input id="point-view-index" style="display: none;" value="0"/>
-
-                        <div class="form-group">
-                            <label>景点名称：</label>
-                            <input type="text" class="form-control" id="pointname" maxlength="20">
-                        </div>
-                        <div class="form-group">
-                            <label>景点简述：</label>
-                            <input type="text" class="form-control" id="pointdescription" maxlength="40">
-                        </div>
-
-                        <div class="form-group" style="display: none;">
-                            <input id="upload-point-image" type="file" style="display: none;">
-                            <input id="pointimage" value="" style="display: none;"/>
-                            <label>上传图片：</label>
-                            <a class="btn btn-primary" onclick="uploadPointImage();">
-                                <span>上传图片</span>
-                            </a>
-                            <span id="point-image-message" ></span>
-                        </div>
-
-                        <input id="point-position-temp" value="" style="display: block;">
-                        <div class="form-group" style="height: 150px;width: 100%; display: none;">
-                            <img id="point-item-image" style="height: 150px;width: 100%; display:none;" src=""/>
-                        </div>
-
-                        <div class="form-group">
-                            <label>上传录音：</label>
-                            <a class="btn btn-primary" onclick="uploadPointAudio();">
-                                <span>上传录音</span>
-                            </a>
-                            <input id="upload-point-audio" type="file" style="display: none;">
-                            <label id="pointaudio" value="" style="display: none"></label>
-                            <a href="#" id="pointaudio_view"
-                               onclick="$('#pointaudio_view').html('');"></a>
-                        </div>
-
-                        <div class="form-group">
-                            <label>景点价格：</label>
-                            <input type="text" class="form-control" id="pointprice">
-                        </div>
-
-                        <div class="form-group">
-                            <input type="checkbox" id="pointfree"/> 试听
-                        </div>
-
-                        <div class="form-group" style="text-align: center">
-                            <button class="btn btn-default" type="button" onclick="addPoint(0);">取消</button>
-                            <button class="btn btn-primary" type="button" onclick="addPoint(1);">完成</button>
-                        </div>
-
-                    </div>
+                </div>
+                <div class="col-md-12 form-inline" style="margin-top: 10px;">
+                    <input type="button" class="btn btn-primary"
+                           onclick="addTouristArea('<?php echo base_url(); ?>', <?php echo isset($area) ? $area->id : 0; ?>);"
+                           value="确认"/>
+                    <a class="btn btn-default" href="<?php echo base_url() . 'area' ?>">
+                        <span>取消</span>
+                    </a>
                 </div>
 
             </div>
-            <div class="col-md-12 form-inline" style="margin-top: 10px;">
-                <input type="button" class="btn btn-primary"
-                       onclick="addTouristArea('<?php echo base_url(); ?>', <?php echo isset($area) ? $area->id : 0; ?>);"
-                       value="确认"/>
-                <a class="btn btn-default" href="<?php echo base_url() . 'area' ?>">
-                    <span>取消</span>
-                </a>
-            </div>
-
-        </div>
-        <input id="page_loaded_status" value="0" style="display: none;"/>
+            <input id="page_loaded_status" value="0" style="display: none;"/>
     </section>
 </div>
 
@@ -442,6 +446,6 @@
 
 <!--////////////////////////// -->
 <script
-    src="http://webapi.amap.com/maps?v=1.3&key=0250860ccb5953fa5d655e8acf40ebb7&plugin=AMap.PolyEditor,AMap.MouseTool,AMap.DistrictSearch"></script>
+        src="http://webapi.amap.com/maps?v=1.3&key=0250860ccb5953fa5d655e8acf40ebb7&plugin=AMap.PolyEditor,AMap.MouseTool,AMap.DistrictSearch"></script>
 <script src="http://webapi.amap.com/ui/1.0/main.js?v=1.0.10"></script>
 <script type="text/javascript" src="<?php echo base_url(); ?>assets/js/map.js" charset="utf-8"></script>

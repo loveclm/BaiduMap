@@ -133,7 +133,7 @@ function test_api() {
 //        url: 'http://www.ayoubc.com/backend/api/Areas/getMyOrderInfos',
 //        url: 'http://192.168.2.18/backend/api/Areas/setPayOrder',
 //        url: 'http://192.168.2.18/backend/api/Areas/setAreaBuyOrder',
-        url: 'http://www.ayoubc.com/backend/api/Areas/getMyAreaInfos',
+        url: 'http://www.ayoubc.com/backend/api/Areas/getMyOrderInfos',
         dataType: 'json',
         username: 'admin',
         password: '1234',

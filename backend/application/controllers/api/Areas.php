@@ -339,7 +339,7 @@ class Areas extends REST_Controller
                         'areaid' => $item->id,
                         'id' => $lastOrder->id,
                         'name' => $item->name,
-                        'cost' => intval($this->order_model->calculateMyPrice($mobile, $item->id) * 100) / 100,
+                        'cost' => round(floatval($item->price)*floatval($item->discount_rate)*100)/100,//intval($this->order_model->calculateMyPrice($mobile, $item->id) * 100) / 100,
                         'paid_price' => $item->price,
                         'discount_rate' => $item->discount_rate,
                         'image' => base_url() . 'uploads/' . $area_info->overay,
@@ -413,7 +413,8 @@ class Areas extends REST_Controller
                 'cost' => $item->price,
                 'discount_rate' => $item->discount_rate,
                 'attractionCnt' => count($attractionList),
-                'attractions' => $attractionList
+                'attractions' => $attractionList,
+                'zoom'=>($itemInfo->zoom)
             ];
             $this->response(array('status' => true, 'CurArea' => $scenic_area), 200);
         }

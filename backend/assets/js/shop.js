@@ -262,7 +262,7 @@ function generateAuth(url, confirm) {
 function showQR(url_suffix) {
     $('#custom-generate-qr-view').show();
     console.log('http://www.ayoubc.com/tour' + encodeURI(url_suffix));
-    $('#qr-view').qrcode({text: 'http://www.ayoubc.com/tour' + url_suffix});
+    $('#qr-view').qrcode({text: 'http://www.ayoubc.com/tour/index.php' + url_suffix});
 }
 
 function generateAuthFinal(url, confirm) {
@@ -277,7 +277,7 @@ function generateAuthFinal(url, confirm) {
 
     if (codeType == 'qr') {
 
-        var data = 'http://www.ayoubc.com/tour?shopid=' + shopid + '&type=' + type + '&targetid=' + target;
+        var data = 'http://www.ayoubc.com/tour/index.php?shopid=' + shopid + '&type=' + type + '&targetid=' + target;
         var authInfo = {
             shopid: shopid,
             type: type,

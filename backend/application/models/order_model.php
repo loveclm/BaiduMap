@@ -148,7 +148,7 @@ class order_model extends CI_Model
         $result = $query->result();
         if (count($result) == 0) return NULL;
         foreach ($result as $item) {
-            foreach($Ids as $id) {
+            foreach ($Ids as $id) {
                 if ($item->areaid == $id) {
                     return $item;
                 }
@@ -191,7 +191,7 @@ class order_model extends CI_Model
         $query = $this->db->get();
         $result = $query->result();
 
-        if (count($result) == 0) return 0;  //unpaid
+        if (count($result) == 0) return 2;  //unpaid
 
         return $this->setStatusByOrderId($result[0]->id);
     }
@@ -205,7 +205,8 @@ class order_model extends CI_Model
 
         $query = $this->db->get();
         $qresult = $query->result();
-        if (count($qresult) == 0) return 0;
+        if (count($qresult) == 0) return 3;
+
         $item = $qresult[0];
         $cur_date = new DateTime();
         if ($item->paid_time == NULL) {
@@ -301,15 +302,16 @@ class order_model extends CI_Model
                             'image' => base_url() . 'uploads/' . $area_info->overay,
                             'pay_method' => 2, // auth order
                             'value' => $item->code,
-                            'cost' => intval($this->calculateMyPrice($mobile, $item->areaid) * 100) / 100,
+                            'cost' => round(floatval($areaitem->price) * floatval($areaitem->discount_rate) * 100) / 100
+                                - intval($this->calculateMyPrice($mobile, $item->areaid) * 100) / 100,
                             'paid_price' => $areaitem->price,
                             'discount_rate' => $areaitem->discount_rate,
                             'order_time' => $item->ordered_time,
                             'paid_time' => $item->paid_time,
                             'expiration_time' => date_format(date_create($item->ordered_time), "Y.m.d") .
                                 ' - ' . date_format(date_create($item->expiration_time), "Y.m.d"),
-                            'canceled_time' => $item->canceled_time,
-                            'state' => $item->status
+                            'cancelled_time' => $item->canceled_time,
+                            'state' => $this->getBuyStatusById($item->areaid, 1, $mobile)
                         )
                     );
                     $total_price += ($areaitem->price * $areaitem->discount_rate);
@@ -329,15 +331,18 @@ class order_model extends CI_Model
                             'image' => base_url() . 'uploads/' . $area_info->overay,
                             'pay_method' => 1, // buy order
                             'value' => $item->code,
-                            'cost' => intval($this->calculateMyPrice($mobile, $item->areaid) * 100) / 100,
+                            'cost' => round($item->code * 100) / 100
+                                - intval($this->calculateMyPrice($mobile, $item->areaid) * 100) / 100,
+
+                            //$item->code,//intval($this->calculateMyPrice($mobile, $item->areaid) * 100) / 100,
                             'origin_price' => $areaitem->price,
                             'discount_rate' => $areaitem->discount_rate,
                             'order_time' => $item->ordered_time,
                             'paid_time' => $item->paid_time,
                             'expiration_time' => date_format(date_create($item->ordered_time), "Y.m.d") .
                                 ' - ' . date_format(date_create($item->expiration_time), "Y.m.d"),
-                            'canceled_time' => $item->canceled_time,
-                            'state' => $item->status
+                            'cancelled_time' => $item->canceled_time,
+                            'state' => $this->getBuyStatusById($item->areaid, 1, $mobile)
                         )
                     );
                     $total_price += $item->code;
@@ -358,14 +363,17 @@ class order_model extends CI_Model
                             'image' => base_url() . 'uploads/' . $attritem->image,
                             'pay_method' => 1, // buy order
                             'value' => $item->code,
-                            'cost' => $attritem->price,
+                            'cost' => round(floatval($item->code) * 100) / 100
+                                - intval($this->calculateMyPrice($mobile, $item->areaid) * 100) / 100,
+
+                            //$item->code,//$attritem->price,
                             'discount_rate' => $attritem->discount_rate,
                             'order_time' => $item->ordered_time,
                             'paid_time' => $item->paid_time,
                             'expiration_time' => date_format(date_create($item->ordered_time), "Y.m.d") .
                                 ' - ' . date_format(date_create($item->expiration_time), "Y.m.d"),
-                            'canceled_time' => $item->canceled_time,
-                            'state' => $item->status
+                            'cancelled_time' => $item->canceled_time,
+                            'state' => $this->getBuyStatusById($item->attractionid, 0, $mobile)
                         )
                     );
                     $total_price += $item->code;
@@ -459,7 +467,7 @@ class order_model extends CI_Model
                         'paid_time' => $item->paid_time,
                         'expiration_time' => date_format(date_create($item->ordered_time), "Y.m.d") .
                             ' - ' . date_format(date_create($item->expiration_time), "Y.m.d"),
-                        'canceled_time' => $item->canceled_time,
+                        'cancelled_time' => $item->canceled_time,
                         'state' => $item->status
                     )
                 );
@@ -487,7 +495,7 @@ class order_model extends CI_Model
                         'paid_time' => $item->paid_time,
                         'expiration_time' => date_format(date_create($item->ordered_time), "Y.m.d") .
                             ' - ' . date_format(date_create($item->expiration_time), "Y.m.d"),
-                        'canceled_time' => $item->canceled_time,
+                        'cancelled_time' => $item->canceled_time,
                         'state' => $item->status
                     )
                 );
@@ -585,7 +593,7 @@ class order_model extends CI_Model
                         'paid_time' => $item->paid_time,
                         'expiration_time' => date_format(date_create($item->ordered_time), "Y.m.d") .
                             ' - ' . date_format(date_create($item->expiration_time), "Y.m.d"),
-                        'canceled_time' => $item->canceled_time,
+                        'cancelled_time' => $item->canceled_time,
                         'state' => $item->status
                     )
                 );
@@ -613,7 +621,7 @@ class order_model extends CI_Model
                         'paid_time' => $item->paid_time,
                         'expiration_time' => date_format(date_create($item->ordered_time), "Y.m.d") .
                             ' - ' . date_format(date_create($item->expiration_time), "Y.m.d"),
-                        'canceled_time' => $item->canceled_time,
+                        'cancelled_time' => $item->canceled_time,
                         'state' => $item->status
                     )
                 );
@@ -641,7 +649,7 @@ class order_model extends CI_Model
                         'paid_time' => $item->paid_time,
                         'expiration_time' => date_format(date_create($item->ordered_time), "Y.m.d") .
                             ' - ' . date_format(date_create($item->expiration_time), "Y.m.d"),
-                        'canceled_time' => $item->canceled_time,
+                        'cancelled_time' => $item->canceled_time,
                         'state' => $item->status
                     )
                 );
