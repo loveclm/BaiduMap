@@ -121,19 +121,18 @@ function test_api() {
     var posi = [116.404845, 39.898345];
     //var id = '00700100002';
 
-    var phone = '12345678901';
-    var cost = '00505000007';
-    var cost = '0.7';
+    var phone = '13130545612';
+    var cost = '2.5';
     var type = '2';
-    var id = '01505093497';
-    var shopid = '7';
+    var id = '74';
+    var shopid = '10';
     $.ajax({
         type: 'POST',
         //url: 'http://www.ayoubc.com/backend/api/Areas/getAllCourseInfos',
 //        url: 'http://www.ayoubc.com/backend/api/Areas/getMyOrderInfos',
 //        url: 'http://192.168.2.18/backend/api/Areas/setPayOrder',
 //        url: 'http://192.168.2.18/backend/api/Areas/setAreaBuyOrder',
-        url: 'http://www.ayoubc.com/backend/api/Areas/getMyOrderInfos',
+        url: 'http://www.ayoubc.com/backend/api/Areas/setAreaBuyOrder',
         dataType: 'json',
         username: 'admin',
         password: '1234',

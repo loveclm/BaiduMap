@@ -67,7 +67,8 @@
                     $authCount = count($authList);
                     for ($i = 0; $i < $authCount; $i++) {
                         $item = $authList[$i];
-
+                        $orderTotalCount = $this->auth_model->getOrderTotal($item->id);
+                        if($orderTotalCount == 0) continue;
                         ?>
                         <tr>
                             <?php
@@ -77,10 +78,11 @@
                                 <?php
                             } ?>
                             <td><?php echo $item->tourName; ?></td>
-                            <td><?php echo $this->auth_model->getOrderTotal($item->id); ?></td>
+                            <td><?php echo $orderTotalCount; ?></td>
                             <td><?php echo $this->auth_model->getOrderUsed($item->id); ?></td>
                             <td><?php echo $item->created; ?></td>
-                            <td><?php echo $item->status != 0 ? ($item->money > 0 ? '先付款' : '后付款') : ''; ?></td>
+<!--                            <td>--><?php //echo $item->status != 0 ? ($item->money > 0 ? '先付款' : '后付款') : ''; ?><!--</td>-->
+                            <td><?php echo ($item->money > 0 ? '先付款' : ''); ?></td>
                             <td><?php echo $item->money > 0 ? $item->money : ''; ?></td>
                             <td>
                                 <a href="<?php echo base_url(); ?>authDetail/<?php echo $item->id; ?>/0">查看 &nbsp;</a>
@@ -98,6 +100,10 @@
                 </table>
                 <div class="form-group">
                     <div id="custom-generate-auth-view" style="display:none;">
+                        <button style="position: absolute; top: 3px; right: 3px;border: none;background: none;"
+                                onclick="$('#custom-generate-auth-view').hide();">
+                            <img src="<?php echo base_url(); ?>assets/images/close.png" style="width: 20px;">
+                        </button>
                         <div class="form-group">
                             <label>选择付款方式？</label>
                         </div>
@@ -108,6 +114,10 @@
                     </div>
 
                     <div id="custom-generate-auth-count-view" style="display:none;">
+                        <button style="position: absolute; top: 3px; right: 3px;border: none;background: none;"
+                                onclick="$('#custom-generate-auth-count-view').hide();">
+                            <img src="<?php echo base_url(); ?>assets/images/close.png" style="width: 20px;">
+                        </button>
                         <div class="form-group">
                             <label>请输入金额 &nbsp; </label>
                             <input id="auth-count" value="0"/> &nbsp; 元

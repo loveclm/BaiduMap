@@ -152,7 +152,7 @@ class systemmanage extends BaseController
                 $this->global['roleId'] = $roleId;
                 $this->addNew();
             } else {
-                $userInfo = array('email' => $email, 'password' => getHashedPassword($password), 'roleId' => $roleId + 1, 'name' => $name,
+                $userInfo = array('email' => $email, 'password' => getHashedPassword($password), 'roleId' => $roleId, 'name' => $name,
                     'mobile' => $mobile, 'createdBy' => $this->vendorId, 'createdDtm' => date('Y-m-d H:i:s'));
 
                 $result = $this->user_model->addNewUser($userInfo);
@@ -207,7 +207,7 @@ class systemmanage extends BaseController
             $permission = $this->input->post('permission');
 
             $result = $this->user_model->getRoleById($roleId);
-            $roleInfo=$result[0];
+            $roleInfo = $result[0];
             $roleInfo->permission = $permission;
             $result = $this->user_model->updateRole($roleInfo, $roleId);
 
@@ -282,10 +282,10 @@ class systemmanage extends BaseController
                 $userInfo = array();
 
                 if (empty($password)) {
-                    $userInfo = array('email' => $email, 'roleId' => $roleId + 1, 'name' => $name,
+                    $userInfo = array('email' => $email, 'roleId' => $roleId, 'name' => $name,
                         'mobile' => $mobile, 'updatedBy' => $this->vendorId, 'updatedDtm' => date('Y-m-d H:i:s'));
                 } else {
-                    $userInfo = array('email' => $email, 'password' => getHashedPassword($password), 'roleId' => $roleId + 1,
+                    $userInfo = array('email' => $email, 'password' => getHashedPassword($password), 'roleId' => $roleId,
                         'name' => ucwords($name), 'mobile' => $mobile, 'updatedBy' => $this->vendorId,
                         'updatedDtm' => date('Y-m-d H:i:s'));
                 }
@@ -311,14 +311,19 @@ class systemmanage extends BaseController
      */
     function deleteUser($id)
     {
-        if ($this->isAdmin() == TRUE) {
-            echo(json_encode(array('status' => 'access')));
+        if ($this->isAdmin() == TRUE || $id == 1) {
+            $this->loadThis();
+            //echo(json_encode(array('status' => 'access')));
         } else {
             $userId = $id;
-            $userInfo = array('isDeleted' => 1, 'updatedBy' => $this->vendorId, 'updatedDtm' => date('Y-m-d H:i:s'));
+            $userInfo = array(
+                'email' => '',
+                'isDeleted' => 1,
+                'updatedBy' => $this->vendorId,
+                'updatedDtm' => date('Y-m-d H:i:s')
+            );
 
             $result = $this->user_model->deleteUser($userId, $userInfo);
-
             if ($result > 0) {
                 echo(json_encode(array('status' => TRUE)));
             } else {

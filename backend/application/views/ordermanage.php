@@ -151,7 +151,7 @@
                                             ?>
                                             <td><?php
                                                 $shopitem = $this->shop_model->getShopById($item->shop_name);
-                                                echo isset($shopitem->name) ? $shopitem->name : '';
+                                                echo isset($shopitem->name) ? $shopitem->name : '平台';
                                                 ?>
                                             </td>
                                             <?php

@@ -134,7 +134,7 @@ class settle_model extends CI_Model
     function getAuthCountByShopId($shopid, $date_s, $date_e)
     {
 
-        $this->db->select("count(od.code) as codeCount, sum(ar.price) as price");
+        $this->db->select("count(od.code) as codeCount, sum(ar.price*ar.discount_rate) as price");
         $this->db->from('tbl_order as od');
         $this->db->join('tbl_authcode as au', 'od.authid = au.id');
         $this->db->join('tourist_area as ar', 'od.areaid = ar.id');

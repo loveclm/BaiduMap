@@ -97,6 +97,10 @@ function processShop(url, id) {
         window.alert("请填写所有信息!.");
         return;
     }
+    if ($("#shoprate").val() == '' || rate <= 0 || type == '0') {
+        window.alert("请填写所有信息!.");
+        return;
+    }
     var address = provinceText + "," +
         cityText + "," + districtText;
     if (name.length > 10) {
@@ -146,7 +150,7 @@ function processShop(url, id) {
     $.post(reqUrl, shopInfo, function (result) {
         console.log(result);
         window.alert(result['message']);
-        location.href = url + 'shop';
+        if (result['status'] == true) location.href = url + 'shop';
     });
 
     return;
@@ -325,6 +329,7 @@ function cancel(url) {
 function cancelQR(url) {
     location.href = url + 'qrmanage';
 }
+
 function findShopInList(url) {
     var strKey = $('#course-search').val();
     $.post(url + "api/Shops/find/" + strKey, function (result) {

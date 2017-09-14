@@ -58,15 +58,15 @@
                                         <div class="form-group" style="margin-bottom: 10px;">
                                             <label for="role">*用户角色 &nbsp;:&nbsp;</label>
                                             <select class="form-control required" id="role" name="role">
-                                                <option value="0">请选择</option>
                                                 <?php
                                                 if (!empty($roles)) {
                                                     $i=0;
                                                     foreach ($roles as $rl) {
                                                         $i++;
+                                                        //if($i==1) continue;
                                                         ?>
-                                                        <option <?php echo isset($roleId)?($i==$roleId?'selected':''):''; ?>
-                                                            value="<?php echo $i; ?>"><?php echo $rl->role ?></option>
+                                                        <option <?php echo isset($roleId)?($rl->roleId==1?'selected':''):''; ?>
+                                                            value="<?php echo $rl->roleId; ?>"><?php echo $rl->role ?></option>
                                                         <?php
                                                     }
                                                 }

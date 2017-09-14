@@ -393,7 +393,7 @@
                                 <span id="point-image-message"></span>
                             </div>
 
-                            <input id="point-position-temp" value="" style="display: block;">
+                            <input id="point-position-temp" value="" style="display: none;">
                             <div class="form-group" style="height: 150px;width: 100%; display: none;">
                                 <img id="point-item-image" style="height: 150px;width: 100%; display:none;" src=""/>
                             </div>

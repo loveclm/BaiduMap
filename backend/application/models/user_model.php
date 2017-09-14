@@ -101,7 +101,7 @@ class user_model extends CI_Model
     {
         $this->db->select('*');
         $this->db->from('tbl_roles');
-        $this->db->where('roleId !=', 1);
+        $this->db->where('roleId <> 2');
         $query = $this->db->get();
 
         return $query->result();
@@ -196,7 +196,7 @@ class user_model extends CI_Model
         $this->db->select('userId, name, email, mobile, roleId');
         $this->db->from('tbl_users');
         $this->db->where('isDeleted', 0);
-        $this->db->where('roleId !=', 1);
+        $this->db->where('roleId <> 2');
         $this->db->where('userId', $userId);
         $query = $this->db->get();
 

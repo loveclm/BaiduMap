@@ -958,6 +958,8 @@ function showEditPoint(targetId) {
     var pointImage = $(pointInfo[4]).val();
     var pointAudio = $(pointInfo[5]).val();
     var pointFree = $(pointInfo[6]).val();
+    console.log(targetId);
+    $('#point-position-temp').val($('#pointposition-' + targetId).val());
 
     $('#pointname').val(pointName);
     $('#pointdescription').val(pointDescription);

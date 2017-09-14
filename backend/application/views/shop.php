@@ -114,7 +114,7 @@
                     $shopCount = count($shopList);
                     for ($i = 0; $i < $shopCount; $i++) {
                         $shop = $shopList[$i];
-
+                        if ($shop->id == 0) continue;
                         ?>
                         <tr>
                             <td><?php echo $shop->name; ?></td>
@@ -228,7 +228,7 @@
                                     $courseInfo = $courseList[$i];
                                     ?>
                                     <option
-                                        value="<?php echo $courseInfo->id; ?>"><?php echo $courseInfo->name; ?></option>
+                                            value="<?php echo $courseInfo->id; ?>"><?php echo $courseInfo->name; ?></option>
                                     <?php
                                 }
                                 ?>
@@ -273,6 +273,6 @@
 <script type="text/javascript" src="<?php echo base_url(); ?>assets/js/jquery.qrcode.js" charset="utf-8"></script>
 <script type="text/javascript" src="<?php echo base_url(); ?>assets/js/qrcode.js" charset="utf-8"></script>
 <script
-    src="http://webapi.amap.com/maps?v=1.3&key=0250860ccb5953fa5d655e8acf40ebb7&plugin=AMap.PolyEditor,AMap.MouseTool,AMap.DistrictSearch"></script>
+        src="http://webapi.amap.com/maps?v=1.3&key=0250860ccb5953fa5d655e8acf40ebb7&plugin=AMap.PolyEditor,AMap.MouseTool,AMap.DistrictSearch"></script>
 <script src="http://webapi.amap.com/ui/1.0/main.js?v=1.0.10"></script>
 <script type="text/javascript" src="<?php echo base_url(); ?>assets/js/map.js" charset="utf-8"></script>

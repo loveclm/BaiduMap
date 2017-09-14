@@ -108,6 +108,7 @@ class shop extends BaseController
         $shopCount = count($shopList);
         for ($i = 0; $i < $shopCount; $i++) {
             $shop = $shopList[$i];
+            if($shop->id==0) continue;
 
             $output_html .= '<tr>';
             $output_html .= '<td>' . $shop->name . '</td>';

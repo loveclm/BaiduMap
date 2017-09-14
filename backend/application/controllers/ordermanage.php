@@ -92,8 +92,9 @@ class ordermanage extends BaseController
         for ($i = 0; $i < $Count; $i++) {
             $item = $buyList[$i];
             $shop = $this->shop_model->getShopById($item->shop_name);
-            if (count($shop) > 0)
+            if (count($shop) > 0) {
                 if ($shop->status != 0) continue;
+            }
             if ($this->global['shop_manager_number'] != '') {
                 if (count($shop) == 0) continue;
                 if ($shop->phonenumber != $this->global['shop_manager_number']) continue;
@@ -123,7 +124,7 @@ class ordermanage extends BaseController
             $output_html .= '</td>';
             $shopitem = $this->shop_model->getShopById($item->shop_name);
             if ($this->global['shop_manager_number'] == '') {
-                $output_html .= '<td>' . (isset($shopitem->name) ? $shopitem->name : '') . '</td>';
+                $output_html .= '<td>' . (isset($shopitem->name) ? $shopitem->name : '平台') . '</td>';
             }
             $output_html .= '<td>';
             $output_html .= ($item->status == '1' ? '使用中' : ($item->status == '2' ? '未付款' :
@@ -184,7 +185,6 @@ class ordermanage extends BaseController
             if ($enDate == '0') $enDate = '';
 
             $authList = $this->order_model->getOrders($searchType, $name, $stDate, $enDate, $status);
-
             $ret['data'] = $this->output_auth_listing($authList);
             $ret['status'] = 'success';
         }
@@ -203,11 +203,10 @@ class ordermanage extends BaseController
 
             if (count($shop) > 0)
                 if ($shop->status != 0) continue;
-            if (count($shop) == 0) continue;
+            //if (count($shop) == 0) continue;
             if ($this->global['shop_manager_number'] != '') {
                 if ($shop->phonenumber != $this->global['shop_manager_number']) continue;
             }
-
             $output_html .= '<tr>';
             $output_html .= '<td>' . $item->number . '</td>';
             $output_html .= '<td>' . $item->mobile . '</td>';

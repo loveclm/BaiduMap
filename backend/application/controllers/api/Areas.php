@@ -210,8 +210,9 @@ class Areas extends REST_Controller
                             array(
                                 'id' => $areaData->id,
                                 'name' => $areaData->name,
-                                'cost' => round((floatval($areaData->price) * floatval($areaData->discount_rate) -
-                                            floatval($this->order_model->calculateMyPrice($phone, $areaData->id))) * 100) / 100,
+                                'cost' => round((floatval($areaData->price) -
+                                            floatval($this->order_model->calculateMyPrice($phone, $areaData->id))) *
+                                        floatval($areaData->discount_rate) * 100) / 100,
                                 'discount_rate' => $areaData->discount_rate,
                                 'attractionCnt' => count(json_decode($areaData->point_list))
                             )
@@ -225,8 +226,9 @@ class Areas extends REST_Controller
                         'id' => $item->id,
                         'name' => $name,    //  $item->name || $name
                         'image' => base_url() . 'uploads/' . $courseInfo->overay,
-                        'cost' => round((floatval($item->price) * floatval($item->discount_rate) -
-                                    floatval($this->order_model->calculateMyPrice($phone, $item->id))) * 100) / 100,
+                        'cost' => round((floatval($item->price) -
+                                    floatval($this->order_model->calculateMyPrice($phone, $item->id))) *
+                                floatval($item->discount_rate) * 100) / 100,
                         'discount_rate' => $item->discount_rate,
                         'scenic_areas' => $areas
                     )
@@ -241,6 +243,8 @@ class Areas extends REST_Controller
     public function getAllAreaInfos_post()
     {
         $request = $this->post();
+        //$mobile = $request['phone'];
+
         $all_areas = $this->area_model->getAreas('', 'all', 1); // 1-available, 2-disable
         if (count($all_areas) == 0) {
             $this->response(array('status' => false, 'Areas' => '-1'), 200);
@@ -314,11 +318,11 @@ class Areas extends REST_Controller
                 if ($lastOrder->status != '1') {
                     if ($lastOrder->status == 3 || $lastOrder->status == 2) continue;
                     if ($lastOrder->ordertype == '2' || $lastOrder->ordertype == '4') {
-                        $status_ret = $this->order_model->getBuyStatusById($lastOrder->areaid, 1, $mobile); // 0-attr, 1-area, 2- course
+                        $status_ret = $this->order_model->getBuyStatusById($lastOrder->areaid, 1, $mobile, $lastOrder->id); // 0-attr, 1-area, 2- course
                     } else if ($lastOrder->ordertype == '3') {
-                        $status_ret = $this->order_model->getBuyStatusById($lastOrder->attractionid, 0, $mobile); // 0-attr, 1-area, 2- course
+                        $status_ret = $this->order_model->getBuyStatusById($lastOrder->attractionid, 0, $mobile, $lastOrder->id); // 0-attr, 1-area, 2- course
                     } else if ($lastOrder->ordertype == '1') {
-                        $status_ret = $this->order_model->getBuyStatusById($lastOrder->areaid, 2, $mobile); // 0-attr, 1-area, 2- course
+                        $status_ret = $this->order_model->getBuyStatusById($lastOrder->areaid, 2, $mobile, $lastOrder->id); // 0-attr, 1-area, 2- course
                     }
                     //$status_ret = $lastOrder->status;
                     if ($status_ret == '4') { // 1-using, 2-unpaid, 3-canceled, 4-expired
@@ -339,7 +343,9 @@ class Areas extends REST_Controller
                         'areaid' => $item->id,
                         'id' => $lastOrder->id,
                         'name' => $item->name,
-                        'cost' => round(floatval($item->price)*floatval($item->discount_rate)*100)/100,//intval($this->order_model->calculateMyPrice($mobile, $item->id) * 100) / 100,
+                        'cost' => round((floatval($item->price) -
+                                    floatval($this->order_model->calculateMyPrice($mobile, $item->id))) *
+                                floatval($item->discount_rate) * 100) / 100,
                         'paid_price' => $item->price,
                         'discount_rate' => $item->discount_rate,
                         'image' => base_url() . 'uploads/' . $area_info->overay,
@@ -414,7 +420,7 @@ class Areas extends REST_Controller
                 'discount_rate' => $item->discount_rate,
                 'attractionCnt' => count($attractionList),
                 'attractions' => $attractionList,
-                'zoom'=>($itemInfo->zoom)
+                'zoom' => ($itemInfo->zoom)
             ];
             $this->response(array('status' => true, 'CurArea' => $scenic_area), 200);
         }
@@ -457,14 +463,14 @@ class Areas extends REST_Controller
                     return;
                 }
                 $authOrderItem = [
-                    "value" => sprintf("%'.011d", time()),
-                    "code" => floor($cost * 100) / 100,
+                    "value" => sprintf("%'.07d%'.04d", time() % 1e7, rand(1000, 9999)),
+                    "code" => round($cost * 100) / 100,
                     "userphone" => $phone,
                     "ordertype" => $type, // 1,2 - course or area
                     "status" => '2',// 2- ordered but unpaid
                     "areaid" => $areaid,
                     "attractionid" => 0,
-                    "authid" => $shopid,
+                    "authid" => $this->order_model->getOrderShopIdFromAreaId($shopid, $areaid),
                     "ordered_time" => $date->format('Y-m-d H:i:s'),
                 ];
                 $this->order_model->addBuyOrder($authOrderItem);
@@ -476,19 +482,20 @@ class Areas extends REST_Controller
                     return;
                 }
                 $authOrderItem = [
-                    "value" => sprintf("%'.011d", time()),
-                    "code" => floor($cost * 100) / 100,
+                    "value" => sprintf("%'.07d%'.04d", time() % 1e7, rand(1000, 9999)),
+                    "code" => round($cost * 100) / 100,
                     "userphone" => $phone,
                     "ordertype" => $type, // 3- attraction
                     "status" => '2', // 2-ordered but unpaid
                     "areaid" => $area[0],
-                    "authid" => $shopid,
+                    "authid" => $this->order_model->getOrderShopIdFromAreaId($shopid, $area[0]),
                     "attractionid" => $areaid,
                     "ordered_time" => $date->format('Y-m-d H:i:s'),
                 ];
                 $this->order_model->addBuyOrder($authOrderItem);
             } else { // 4-authorization code
                 if ($shopid != '') {
+                    $areaItem = $this->area_model->getAreaById($areaid);
                     $authOrderItem = [
                         "code" => $areaid,
                         "userphone" => $phone,

@@ -66,7 +66,7 @@ class Shops extends REST_Controller
         if (!$id) {
             $new_id = $this->user_model->addNewUser($newAccount);
             if($new_id == 0) {
-                $this->response(array('status' => false, 'id' => 0, 'message' => sprintf('此账号已存在!.', $new_id)), 200);
+                $this->response(array('status' => false, 'id' => 0, 'message' => sprintf('此账号已存在.', $new_id)), 200);
             }else {
                 $new_id = $this->shop_model->add($newShop);
                 $this->response(array('status' => true, 'id' => $new_id, 'message' => sprintf('新增商家成功.', $new_id)), 200);
@@ -119,7 +119,7 @@ class Shops extends REST_Controller
             $date = new DateTime();
             $authOrderItem = array(
                 "authid" => sprintf("%d", $authid),
-                "value" => sprintf("%'.011d", time()),
+                "value" => sprintf("%'.07d%'.04d", time()%1e7,rand(1000,9999)),
                 "userphone" => '0',
                 "areaid" => $authInfo['targetid'],
                 "status" => '0',

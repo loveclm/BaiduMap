@@ -114,7 +114,7 @@ class authmanage extends BaseController
             $output_html .= '<td>' . $this->auth_model->getOrderTotal($item->id) . '</td>';
             $output_html .= '<td>' . $this->auth_model->getOrderUsed($item->id) . '</td>';
             $output_html .= '<td>' . $item->created . '</td>';
-            $output_html .= '<td>' . ($item->status != 0 ? ($item->money > 0 ? '先付款' : '后付款') : '') . '</td>';
+            $output_html .= '<td>' . ($item->money > 0 ? '先付款' : '') . '</td>';
             $output_html .= '<td>' . ($item->money > 0 ? $item->money : '') . '</td>';
             $output_html .= '<td>';
             $output_html .= '<a href="' . base_url() . 'authDetail/' . $item->id . '/0">查看 &nbsp;</a>';

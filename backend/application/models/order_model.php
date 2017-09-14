@@ -52,7 +52,7 @@ class order_model extends CI_Model
             'au.shopid as shop_name, ta.type as type, od.status as status, od.ordered_time as ordered_time');
         $this->db->from('tbl_order as od');
         $this->db->join('tbl_authcode as au', 'od.authid = au.id');
-        $this->db->join('tourist_area as ta', 'au.targetid = ta.id');
+        $this->db->join('tourist_area as ta', 'od.areaid = ta.id');
         switch ($searchType) {
             case '0':
                 $likeCriteria = "(od.value  LIKE '%" . $name . "%')";
@@ -176,7 +176,7 @@ class order_model extends CI_Model
      * This function is used to add new shop to system
      * @return number $insert_id : This is last inserted id
      */
-    function getBuyStatusById($id, $type, $phone)
+    function getBuyStatusById($id, $type, $phone, $itemid = 0)
     {
         $this->db->select('*');
         $this->db->from('tbl_order');
@@ -186,8 +186,9 @@ class order_model extends CI_Model
             $this->db->where('areaid', $id);
             $this->db->where('attractionid', 0);
         }
+        if ($itemid != 0) $this->db->where('id', $itemid);
         $this->db->where('userphone', $phone);
-        $this->db->order_by('ordered_time', 'DEC');
+        $this->db->order_by('ordered_time', 'DESC');
         $query = $this->db->get();
         $result = $query->result();
 
@@ -201,13 +202,16 @@ class order_model extends CI_Model
         $this->db->select('*');
         $this->db->from('tbl_order');
         $this->db->where('id', $id);
-        $this->db->where('status <> 3');
+        //$this->db->where('status <> 3');
 
         $query = $this->db->get();
         $qresult = $query->result();
-        if (count($qresult) == 0) return 3;
-
+        if (count($qresult) == 0) return 0;
         $item = $qresult[0];
+
+        //if ($item->status != '1') return $item->status;
+        if ($item->status == '3') return $item->status;
+
         $cur_date = new DateTime();
         if ($item->paid_time == NULL) {
             $item->status = 2; // it is only ordered.
@@ -241,7 +245,7 @@ class order_model extends CI_Model
         return $qresult;
     }
 
-    function calculateMyPrice($phone, $areaid = 0)
+    function calculateMyPrice($phone, $areaid = 0, $areatype = 0)
     {
         // get my selected price
         $price = 0;
@@ -252,9 +256,10 @@ class order_model extends CI_Model
 
             foreach ($areaInfos as $item) {
                 $areaInfo = $this->area_model->getAreaById($item->id);
-                if ($this->getBuyStatusById($item->id, 1, $phone) == 1) {
-                    $price += floatval($areaInfo->price) * floatval($areaItem->discount_rate);
-                }
+                //if ($this->getBuyStatusById($item->id, 1, $phone) == 1) {
+                //$price += floatval($areaInfo->price) * floatval($areaItem->discount_rate);
+                $price += $this->calculateMyPrice($phone, $item->id);
+                //}
             }
         } else if ($type == 2) { // area
             $pointInfos = json_decode($areaItem->point_list);
@@ -263,7 +268,7 @@ class order_model extends CI_Model
                 //var_dump($retStatus);
                 //var_dump($item);
                 if ($retStatus == 2) {
-                    if ($item->trial != 1) $price += floatval($item->price) * floatval($areaItem->discount_rate);
+                    if ($item->trial != 1) $price += floatval($item->price);
                     //  var_dump($price);
                 }
             }
@@ -295,15 +300,15 @@ class order_model extends CI_Model
                         $Auths,
                         array(
                             'id' => $item->value,
-                            'name' => $areaitem->name,
+                            'name' => $this->area_model->getCourseNameByAreaId($item->areaid),
                             'areaid' => $item->areaid,
                             'attractionid' => $item->attractionid,
                             'order_kind' => $kind,
                             'image' => base_url() . 'uploads/' . $area_info->overay,
                             'pay_method' => 2, // auth order
                             'value' => $item->code,
-                            'cost' => round(floatval($areaitem->price) * floatval($areaitem->discount_rate) * 100) / 100
-                                - intval($this->calculateMyPrice($mobile, $item->areaid) * 100) / 100,
+                            'cost' => round((floatval($areaitem->price) - $this->calculateMyPrice($mobile, $item->areaid))
+                                    * floatval($areaitem->discount_rate) * 100) / 100,
                             'paid_price' => $areaitem->price,
                             'discount_rate' => $areaitem->discount_rate,
                             'order_time' => $item->ordered_time,
@@ -311,7 +316,7 @@ class order_model extends CI_Model
                             'expiration_time' => date_format(date_create($item->ordered_time), "Y.m.d") .
                                 ' - ' . date_format(date_create($item->expiration_time), "Y.m.d"),
                             'cancelled_time' => $item->canceled_time,
-                            'state' => $this->getBuyStatusById($item->areaid, 1, $mobile)
+                            'state' => $this->getBuyStatusById($item->areaid, 1, $mobile, $item->id)
                         )
                     );
                     $total_price += ($areaitem->price * $areaitem->discount_rate);
@@ -331,8 +336,8 @@ class order_model extends CI_Model
                             'image' => base_url() . 'uploads/' . $area_info->overay,
                             'pay_method' => 1, // buy order
                             'value' => $item->code,
-                            'cost' => round($item->code * 100) / 100
-                                - intval($this->calculateMyPrice($mobile, $item->areaid) * 100) / 100,
+                            'cost' => round((floatval($item->code) - $this->calculateMyPrice($mobile, $item->areaid)
+                                        * floatval($areaitem->discount_rate)) * 100) / 100,
 
                             //$item->code,//intval($this->calculateMyPrice($mobile, $item->areaid) * 100) / 100,
                             'origin_price' => $areaitem->price,
@@ -342,7 +347,7 @@ class order_model extends CI_Model
                             'expiration_time' => date_format(date_create($item->ordered_time), "Y.m.d") .
                                 ' - ' . date_format(date_create($item->expiration_time), "Y.m.d"),
                             'cancelled_time' => $item->canceled_time,
-                            'state' => $this->getBuyStatusById($item->areaid, 1, $mobile)
+                            'state' => $this->getBuyStatusById($item->areaid, 1, $mobile, $item->id)
                         )
                     );
                     $total_price += $item->code;
@@ -352,6 +357,8 @@ class order_model extends CI_Model
                     $attritem = json_decode($areaitem->point_list);
                     $attr_id = explode('_', $item->attractionid);
                     $attritem = $attritem[$attr_id[1] - 1];
+                    $attrStatus = $this->getBuyStatusById($item->attractionid, 0, $mobile, $item->id);
+
                     array_push(
                         $Auths,
                         array(
@@ -363,8 +370,8 @@ class order_model extends CI_Model
                             'image' => base_url() . 'uploads/' . $attritem->image,
                             'pay_method' => 1, // buy order
                             'value' => $item->code,
-                            'cost' => round(floatval($item->code) * 100) / 100
-                                - intval($this->calculateMyPrice($mobile, $item->areaid) * 100) / 100,
+                            'cost' => round((floatval($item->code)
+                                        - floatval((($attrStatus == '1') ? $attritem->price : '0'))) * 100) / 100,
 
                             //$item->code,//$attritem->price,
                             'discount_rate' => $attritem->discount_rate,
@@ -373,7 +380,7 @@ class order_model extends CI_Model
                             'expiration_time' => date_format(date_create($item->ordered_time), "Y.m.d") .
                                 ' - ' . date_format(date_create($item->expiration_time), "Y.m.d"),
                             'cancelled_time' => $item->canceled_time,
-                            'state' => $this->getBuyStatusById($item->attractionid, 0, $mobile)
+                            'state' => $this->getBuyStatusById($item->attractionid, 0, $mobile, $item->id)
                         )
                     );
                     $total_price += $item->code;
@@ -504,6 +511,24 @@ class order_model extends CI_Model
         return $Auths;
     }
 
+    function getOrderShopIdFromAreaId($shopid, $areaid)
+    {
+        $orderAreaName = utf8_encode('- ' . $this->area_model->getCourseNameByAreaId($areaid) . ' -');
+
+        $this->db->select('targetid');
+        $this->db->from('qrcode');
+        $this->db->where('shopid', $shopid);
+        $query = $this->db->get();
+        $areaIdList = $query->result();
+        $areaNames = '';
+        if (count($areaIdList) == 0) return 0;
+        foreach ($areaIdList as $item) {
+            $areaNames .= utf8_encode(' - ' . $this->area_model->getCourseNameByAreaId($item->targetid) . ' - ');
+        }
+        if (strrpos($areaNames, $orderAreaName) == FALSE) return 0;
+        return $shopid;
+    }
+
     /**
      * This function is used to add new shop to system
      * @return number $insert_id : This is last inserted id
@@ -520,13 +545,16 @@ class order_model extends CI_Model
 
         $OrderInfo = $result['0'];
         if ($OrderInfo->userphone != '0') return 0;
-        $OrderInfo->userphone = $authInfo['userphone'];
         $shop = $this->getShopIdByAuthId($OrderInfo->authid);
 
         if (count($shop) == 0) $OrderInfo->authid = 0;
         else if ($shop->shopid != $authInfo['authid'])
-            $OrderInfo->authid = 0;
+            return 0; //$OrderInfo->authid = 0;
 
+        if ($this->getBuyStatusById($OrderInfo->areaid, 1, $authInfo['userphone']) == 1)
+            return 0;
+
+        $OrderInfo->userphone = $authInfo['userphone'];
         $OrderInfo->paid_time = $authInfo['paid_time'];
         $this->db->where('id', $OrderInfo->id);
         $this->db->update('tbl_order', $OrderInfo);
@@ -559,12 +587,13 @@ class order_model extends CI_Model
         $result = $query->result();
         if (count($result) == 0) return NULL;
         $OrderInfo = $result['0'];
-        if ($this->setStatusByOrderId($OrderInfo->id) == 3) return 0;
+        $OrderInfo->status = 1;
+        //if ($this->setStatusByOrderId($OrderInfo->id) == 3) return 0;
         $date = new DateTime();
         $OrderInfo->paid_time = date_format($date, "Y-m-d H:i:s");
         $this->db->where('id', $OrderInfo->id);
         $this->db->update('tbl_order', $OrderInfo);
-        $OrderInfo->status = $this->setStatusByOrderId($OrderInfo->id);
+        //$OrderInfo->status = $this->setStatusByOrderId($OrderInfo->id);
         $item = $OrderInfo;
         $mobile = $phone;
         $Types = $item->ordertype;
